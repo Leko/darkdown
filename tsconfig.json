@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "https://*": ["../../../../.cache/deno/deps/https"]
+    }
+  }
+}
