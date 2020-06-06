@@ -1,2 +1,10 @@
 # deno-plugin-study
-Create Deno plugin using third party crate
+
+Example of a Deno plugin using a third party crate.
+
+## Getting started
+
+```
+cargo build
+deno run --unstable --allow-plugin --allow-read --allow-write lib.ts
+```
