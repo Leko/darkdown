@@ -15,3 +15,9 @@ deno run --unstable --allow-plugin --allow-read --allow-write lib.ts
   - Utility for loading plugin
 - [denoland/deno/test_plugin](https://github.com/denoland/deno/tree/master/test_plugin)
   - Officially provided example plugin and TypeScript tests
+
+## Testing
+
+```
+deno test --allow-read=spec.json darkdown.test.ts
+```
