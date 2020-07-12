@@ -1,9 +1,10 @@
 import { assertEquals } from 'https://deno.land/std/testing/asserts.ts'
+import { readFileStr } from 'https://deno.land/std/fs/mod.ts'
 import { transform, documentParser } from './commonmark.ts'
 
-const suite = await fetch(
-  'https://spec.commonmark.org/0.29/spec.json'
-).then((res) => res.json())
+const suite = JSON.parse(
+  await readFileStr('./fixtures/commonmark-0.29-spec.json')
+)
 
 type Spec = {
   markdown: string
