@@ -1,11 +1,9 @@
 import { C_SPACE, C_TAB } from '../scanner.ts'
 import { keyword, repeat, or, seq, map } from '../parser-combinator.ts'
-import { SOL } from './sol.ts'
 
 // https://spec.commonmark.org/0.29/#tabs
 export const indent = map(
   seq(
-    SOL(),
     or(
       seq(keyword(C_TAB)),
       seq(repeat(keyword(C_SPACE), 1), keyword(C_TAB)),

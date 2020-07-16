@@ -6,10 +6,12 @@ export type TextRange = [Position, Position]
 
 export type ASTLeaf<T> = T & {
   text: string
-  sourcepos: TextRange
+  start: number
+  length: number
 }
 export type ASTNode<T extends { children: any[] }> = T & {
-  sourcepos: TextRange
+  start: number
+  length: number
 }
 
 export type Text = ASTLeaf<{
@@ -71,18 +73,33 @@ export type BlockQuote = ASTNode<{
   children: Paragraph[]
 }>
 
+export type BulletListMarker = ASTNode<{
+  type: 'bullet_list_marker'
+  char: string
+  children: []
+}>
+export type OrderedListMarker = ASTNode<{
+  type: 'ordered_list_marker'
+  number: number
+  delimiter: string
+  text: string
+  children: []
+}>
+export type ListType = BulletListMarker['type'] | OrderedListMarker['type']
+
 export type ListItem = ASTNode<{
-  type: 'item'
+  type: 'list_item'
   children: Paragraph[]
+  indent: number
+  marker: BulletListMarker | OrderedListMarker
+  start: number
+  length: number
 }>
 
 export type List = ASTNode<{
   type: 'list'
-  listType: 'Bullet' | 'Ordered'
-  listTight: boolean
-  listStart: number
-  listDelimiter: ')' | '.' | null
-  children: Paragraph[]
+  listType: ListType
+  children: ListItem[]
 }>
 
 export type Heading = ASTNode<{
@@ -108,7 +125,7 @@ export type ThematicBreak = ASTLeaf<{
   type: 'thematic_break'
 }>
 
-export type FIXME_All_Notes =
+export type FIXME_All_Nodes =
   | Str
   | Link
   | Image
@@ -127,5 +144,5 @@ export type FIXME_All_Notes =
 
 export type Document = ASTNode<{
   type: 'document'
-  children: FIXME_All_Notes[]
+  children: FIXME_All_Nodes[]
 }>

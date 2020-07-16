@@ -13,7 +13,7 @@ export const whitespaceChar = char(
   [
     C_SPACE,
     C_TAB,
-    C_NEWLINE,
+    // C_NEWLINE,
     C_LINE_TABULATION,
     C_FORM_FEED,
     C_CARRIAGE_RETURN,

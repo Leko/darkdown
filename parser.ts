@@ -1,5 +1,5 @@
 import { Token, TokenType, C_TAB } from './scanner.ts'
-import { Document, FIXME_All_Notes } from './ast.ts'
+import { Document, FIXME_All_Nodes } from './ast.ts'
 import { convertTabToSpaces } from './util/tab-stop.ts'
 
 // Remove it
@@ -66,7 +66,7 @@ export class Parser {
   }
 
   parse(tokens: Token[]): Document {
-    const children: FIXME_All_Notes[] = []
+    const children: FIXME_All_Nodes[] = []
 
     this.initialize(tokens)
     while (this.#cursor < this.#tokens.length) {
