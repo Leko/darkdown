@@ -13,10 +13,13 @@ import {
   Emphasis,
   Strong,
   Code,
-} from './ast.ts'
+} from '../ast.ts'
+import { C_NEWLINE } from '../scanner.ts'
 
-export class Generator {
-  generate(doc: Document): string {
+export type Option = {}
+
+export class HtmlRenderer {
+  render(doc: Document, _options: Option): string {
     return (
       doc.children
         .filter((c) => c.type !== 'empty_line')
@@ -41,6 +44,8 @@ export class Generator {
         return this.renderHeading(node)
       case 'str':
         return this.renderString(node)
+      case 'empty_line':
+        return C_NEWLINE
       default:
         throw new Error(`Unexpected node: ${JSON.stringify(node, null, 2)}`)
     }
@@ -59,10 +64,7 @@ export class Generator {
   private renderList(node: List): string {
     const tag = node.listType === 'bullet_list_marker' ? 'ul' : 'ol'
     return `<${tag}>\n${node.children
-      .map((c) =>
-        // @ts-ignore FIXME
-        this.renderListItem(c)
-      )
+      .map((c) => this.renderListItem(c))
       .join(
         // FIXME: It may cause a problem.
         '\n'
@@ -70,6 +72,9 @@ export class Generator {
   }
 
   private renderListItem(node: ListItem): string {
+    if (!node.children.map) {
+      console.log(node)
+    }
     return `<li>${this.breakIfBlock(
       node.children.map((c) => this.renderNode(c)).join('')
     )}</li>`

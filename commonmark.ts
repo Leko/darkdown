@@ -1,4 +1,4 @@
-import { Generator } from './generator.ts'
+import { HtmlRenderer, Option as StringifyOption } from './renderer/html.ts'
 import { Document } from './ast.ts'
 import { tap, many, or, seq, map, EOS } from './parser-combinator.ts'
 import { leafBlockParser } from './parsers/leaf-block.ts'
@@ -9,8 +9,7 @@ import { codeBlockParser } from './parsers/code-block.ts'
 import { emptyLineParser } from './parsers/empty-line.ts'
 import { thematicBreakParser } from './parsers/thematic-break.ts'
 
-type Option = {}
-type StringifyOption = {}
+type ParseOption = {}
 type Result = {
   html: string
 }
@@ -65,11 +64,12 @@ export const documentParser = map(
 
 function tabToSpaces(str: string, tabStop: number): string {
   const convertToSpaces = (matchedEntire: string, matched: string) => {
-    let start = matchedEntire.indexOf(matched)
+    let start = matchedEntire.replace(/^\n+/, '').indexOf(matched)
     if (start === -1) {
       start = 0
     }
     const spaces = tabStop - (start % tabStop)
+    console.log(JSON.stringify({ start, spaces, matchedEntire }, null, 2))
     return matchedEntire.replace(matched, ' '.repeat(spaces))
   }
   let tmp = str
@@ -85,19 +85,28 @@ function tabToSpaces(str: string, tabStop: number): string {
 
 export async function transform(
   markdown: string,
-  options: Option & StringifyOption
+  options: {
+    parseOption?: ParseOption
+    stringifyOption?: StringifyOption
+  } = {
+    parseOption: {},
+    stringifyOption: {},
+  }
 ): Promise<Result> {
+  const parseOption: ParseOption = { ...options.parseOption }
+  const stringifyOption: StringifyOption = { ...options.stringifyOption }
   console.log(
     [markdown, tabToSpaces(markdown, 4)].map((c) => JSON.stringify(c))
   )
-  return parse(tabToSpaces(markdown, 4), options).then((ast) =>
-    stringify(ast, options)
+  // Deno.exit(0)
+  return parse(tabToSpaces(markdown, 4), parseOption).then((ast) =>
+    stringify(ast, stringifyOption)
   )
 }
 
 export async function parse(
   markdown: string,
-  options: Option
+  options: ParseOption
 ): Promise<Document> {
   const [parsed, doc, pos] = documentParser(markdown, 0) as any
   if (pos !== markdown.length) {
@@ -111,9 +120,9 @@ export async function stringify(
   doc: Document,
   options: StringifyOption
 ): Promise<Result> {
-  const generator = new Generator()
+  const generator = new HtmlRenderer()
   console.log(JSON.stringify(doc, null, 2))
-  let html = generator.generate(doc)
+  let html = generator.render(doc, options)
   return {
     html,
   }

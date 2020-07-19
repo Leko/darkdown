@@ -1,4 +1,7 @@
-import { assertEquals } from 'https://deno.land/std/testing/asserts.ts'
+import {
+  assertEquals,
+  assertNotEquals,
+} from 'https://deno.land/std/testing/asserts.ts'
 import { readFileStr } from 'https://deno.land/std/fs/mod.ts'
 import { transform, documentParser } from './commonmark.ts'
 
@@ -17,14 +20,10 @@ type Spec = {
 
 const SKIP_CASES = [
   // TODO: List with paragraph, empty lines with paragraph
-  4,
-  5,
   34,
   // TODO: When implement list
   9,
   // TODO: Continue condition of paragraph
-  25, // empty line
-  28, // themetic break
   48, // heading
   // TODO: Continue condition of list
   30,
@@ -45,7 +44,15 @@ const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
-const tests = omit(suite.slice(0, 77), SKIP_CASES)
+const tests = omit(suite.slice(0, 78), SKIP_CASES)
+
+SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
+  const testName = JSON.stringify(spec.markdown)
+  Deno.test(`FAIL [${spec.example}] ${testName}`, async () => {
+    const { html } = await transform(spec.markdown, {})
+    assertNotEquals(html, spec.html)
+  })
+})
 
 tests.forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)
@@ -54,10 +61,3 @@ tests.forEach((spec: Spec) => {
     assertEquals(html, spec.html)
   })
 })
-// suite.slice(0, 4).forEach((spec: Spec) => {
-//   const testName = spec.markdown.replace(/\t/g, '\\t').replace(/\n/g, '\\n')
-//   Deno.test(`[${spec.example}] "${testName}"`, async () => {
-//     const { html } = await transform(spec.markdown, {})
-//     assertEquals(html, spec.html)
-//   })
-// })

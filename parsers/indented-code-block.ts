@@ -30,11 +30,6 @@ export const indentedCodeBlockParser = map(
     )
   ),
   (r, end, start): CodeBlock => ({
-    // @ts-ignore
-    _: console.log(
-      [r[0], ...r[1]],
-      JSON.stringify([r[0], ...r[1]].join(C_NEWLINE) + C_NEWLINE)
-    ),
     type: 'code_block',
     text: [r[0], ...r[1]].join(C_NEWLINE) + C_NEWLINE,
     language: null,
