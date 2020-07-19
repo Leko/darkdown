@@ -39,12 +39,14 @@ const SKIP_CASES = [
   51,
   52,
   53,
+  // TODO: Nested multiple type list (ol > ul)
+  79,
 ]
 const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
-const tests = omit(suite.slice(0, 78), SKIP_CASES)
+const tests = omit(suite.slice(0, 80), SKIP_CASES)
 
 SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)

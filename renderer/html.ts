@@ -1,4 +1,4 @@
-import escape from 'https://deno.land/x/lodash/escape.js'
+import escapeHTML from 'https://deno.land/x/lodash/escape.js'
 import {
   Document,
   CodeBlock,
@@ -58,7 +58,7 @@ export class HtmlRenderer {
   }
 
   private renderCodeBlock(node: CodeBlock): string {
-    return `<pre><code>${node.text}</code></pre>`
+    return `<pre><code>${escapeHTML(node.text)}</code></pre>`
   }
 
   private renderList(node: List): string {
@@ -104,7 +104,7 @@ export class HtmlRenderer {
         switch (child.type) {
           case 'text':
             // FIXME: Move to heading parser (case 37)
-            return escape(child.text.replace(/ +$/, ''))
+            return escapeHTML(child.text.replace(/ +$/, ''))
           case 'softbreak':
             return '\n'
           case 'linebreak':
