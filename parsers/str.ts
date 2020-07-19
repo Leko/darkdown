@@ -49,7 +49,9 @@ export const textParser = (except?: Parser<any>) =>
       text: r
         .join('')
         // FIXME: Is it right handling?
-        .replace(/\\#/g, '#'),
+        .replace(/\\#/g, '#') // case 35
+        .replace(/\\>/g, '>') // case 72
+        .replace(/\\-/g, '-'), // case 76
       ...toLoC({ end, start }),
     })
   )
