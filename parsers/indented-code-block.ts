@@ -1,10 +1,21 @@
 import { C_NEWLINE } from '../scanner.ts'
-import { until, seq, map, many, tap, or } from '../parser-combinator.ts'
+import {
+  atLeast,
+  until,
+  seq,
+  map,
+  many,
+  tap,
+  or,
+  option,
+  between,
+} from '../parser-combinator.ts'
 import { toLoC } from './loc.ts'
 import { lineEnding } from './line-ending.ts'
 import { indent } from './indent.ts'
 import { CodeBlock } from '../ast.ts'
 import { blankLine } from './blank-line.ts'
+import { space } from './space.ts'
 
 const line = map(
   seq(
@@ -23,7 +34,10 @@ export const indentedCodeBlockParser = map(
       line,
       many(
         or(
-          map(blankLine, () => ''),
+          tap(
+            'indented_code_block > space[0-3]+empty',
+            map(seq(between(space, 0, 3), lineEnding), () => '')
+          ),
           line
         )
       )
