@@ -4,35 +4,36 @@ export type Position = [number, number]
 // [start, end]
 export type TextRange = [Position, Position]
 
-export type ASTLeaf<T> = T & {
-  text: string
-  start: number
-  length: number
-}
-export type ASTNode<T extends { children: any[] }> = T & {
+export type LoC = {
   start: number
   length: number
 }
 
-export type Text = ASTLeaf<{
+export type ASTText<T> = T &
+  LoC & {
+    text: string
+  }
+export type ASTNode<T extends { children: any[] }> = T & LoC
+
+export type Text = ASTText<{
   type: 'text'
 }>
-export type SoftBreak = ASTLeaf<{
+export type SoftBreak = ASTText<{
   type: 'softbreak'
 }>
-export type LineBreak = ASTLeaf<{
+export type LineBreak = ASTText<{
   type: 'linebreak'
 }>
-export type Emphasis = ASTLeaf<{
+export type Emphasis = ASTText<{
   type: 'emph'
 }>
-export type Strong = ASTLeaf<{
+export type Strong = ASTText<{
   type: 'strong'
 }>
-export type Code = ASTLeaf<{
+export type Code = ASTText<{
   type: 'code'
 }>
-export type HTMLInline = ASTLeaf<{
+export type HTMLInline = ASTText<{
   type: 'html_inline'
 }>
 
@@ -48,6 +49,11 @@ export type Str = ASTNode<{
     | Code
     | HTMLInline
   )[]
+}>
+
+export type EmptyLine = ASTNode<{
+  type: 'empty_line'
+  children: never[]
 }>
 
 export type Link = ASTNode<{
@@ -92,8 +98,6 @@ export type ListItem = ASTNode<{
   children: Paragraph[]
   indent: number
   marker: BulletListMarker | OrderedListMarker
-  start: number
-  length: number
 }>
 
 export type List = ASTNode<{
@@ -105,10 +109,10 @@ export type List = ASTNode<{
 export type Heading = ASTNode<{
   type: 'heading'
   level: 1 | 2 | 3 | 4 | 5 | 6
-  children: Paragraph[]
+  children: Str[]
 }>
 
-export type CodeBlock = ASTLeaf<{
+export type CodeBlock = ASTText<{
   type: 'code_block'
   language: string | null
   // https://spec.commonmark.org/0.29/#info-string
@@ -121,12 +125,13 @@ export type HTMLBlock = ASTNode<{
 }>
 
 // https://spec.commonmark.org/0.29/#thematic-break
-export type ThematicBreak = ASTLeaf<{
+export type ThematicBreak = ASTText<{
   type: 'thematic_break'
 }>
 
 export type FIXME_All_Nodes =
   | Str
+  | EmptyLine
   | Link
   | Image
   | Paragraph

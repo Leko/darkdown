@@ -2,6 +2,7 @@ import { C_CLOSE_PARENTHES, C_DOT } from '../scanner.ts'
 import { char, seq, map, between } from '../parser-combinator.ts'
 import { decimalChar } from './decimal-char.ts'
 import { OrderedListMarker } from '../ast.ts'
+import { toLoC } from './loc.ts'
 
 const decimals = map(between(decimalChar, 1, 9), (r) => r.flat().join(''))
 
@@ -13,8 +14,7 @@ export const orderedListMarker = map(
     number: r[0],
     delimiter: r[1],
     text: r.join(''),
-    start,
     children: [],
-    length: end - start,
+    ...toLoC({ end, start }),
   })
 )

@@ -4,9 +4,9 @@ import { ParseResult, ParseFailed } from './types.ts'
 export const EOS = () => (
   input: string,
   pos: number
-): ParseResult<null> | ParseFailed => {
+): ParseResult<boolean> | ParseFailed => {
   if (input.length === pos) {
-    return [true, null, pos]
+    return [true, true, pos]
   }
   return [false, null, pos]
 }

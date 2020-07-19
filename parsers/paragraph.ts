@@ -6,6 +6,7 @@ import {
   C_CLOSE_PARENTHES,
   C_OPEN_BRACKET,
   C_CLOSE_BRACKET,
+  C_NEWLINE,
 } from '../scanner.ts'
 import {
   or,
@@ -15,30 +16,39 @@ import {
   tap,
   keyword,
   option,
-  until,
+  not,
+  EOS,
+  repeatIntercept,
+  Parser,
 } from '../parser-combinator.ts'
 import { linkDefinitionParser } from '../parsers/link-definition.ts'
 import { strParser } from '../parsers/str.ts'
-import { Paragraph } from '../ast.ts'
+import { Paragraph, Str } from '../ast.ts'
+import { toLoC } from './loc.ts'
 import { lineEnding } from './line-ending.ts'
+import { thematicBreakParser } from './thematic-break.ts'
 
 export const linkParser = seq(
   keyword(C_OPEN_BRACKET),
-  strParser,
+  strParser(),
   keyword(C_CLOSE_BRACKET),
   or(
     seq(
       keyword(C_OPEN_PARENTHES),
-      strParser, // FIXME
+      strParser(), // FIXME
       keyword(C_CLOSE_PARENTHES)
     ),
     option(
       seq(
         atLeast(keyword(C_SPACE), 1),
         or(
-          seq(keyword(C_DOUBLE_QUOTE), strParser, keyword(C_DOUBLE_QUOTE)),
-          seq(keyword(C_SINGLE_QUOTE), strParser, keyword(C_SINGLE_QUOTE)),
-          seq(keyword(C_OPEN_PARENTHES), strParser, keyword(C_CLOSE_PARENTHES))
+          seq(keyword(C_DOUBLE_QUOTE), strParser(), keyword(C_DOUBLE_QUOTE)),
+          seq(keyword(C_SINGLE_QUOTE), strParser(), keyword(C_SINGLE_QUOTE)),
+          seq(
+            keyword(C_OPEN_PARENTHES),
+            strParser(),
+            keyword(C_CLOSE_PARENTHES)
+          )
         )
       )
     )
@@ -47,33 +57,53 @@ export const linkParser = seq(
 
 export const imageParser = seq(keyword('!'), linkParser)
 
-// export const paragraphParser = map(
-//   until(lineEnding),
-//   (result, end, start): Paragraph => ({
-//     type: 'paragraph',
-//     children: result as any,
-//     start,
-//     length: end - start,
-//   })
-// )
-export const paragraphParser = map(
+export const paragraphParser: Parser<Paragraph> = map(
   tap(
     'paragraph',
-    atLeast(
-      or(
-        strParser
-        // linkDefinitionParser,
-        // linkParser,
-        // imageParser
-      ),
-      1
+    repeatIntercept({
+      intercepter: thematicBreakParser,
+      atLeast: 1,
+    })(
+      seq(
+        or(
+          map(strParser(), (r) => ({
+            ...r,
+            children: [
+              // Trim leading whitespaces
+              { ...r.children[0], text: r.children[0].text.trimStart() },
+              ...r.children.slice(1),
+            ],
+          }))
+          // linkDefinitionParser,
+          // linkParser,
+          // imageParser
+        ),
+        map(
+          option(or(lineEnding, EOS())),
+          // FIXME: Is it "Str"? It's keyword I think.
+          (r, end, start): Str => ({
+            type: 'str',
+            children:
+              // r[1] === true means end of string
+              r && r[0]
+                ? []
+                : [
+                    {
+                      type: 'text',
+                      text: C_NEWLINE,
+                      ...toLoC({ end, start }),
+                    },
+                  ],
+            ...toLoC({ end, start }),
+          })
+        )
+      )
     )
   ),
   (result, end, start): Paragraph => ({
     type: 'paragraph',
     // @ts-ignore
-    children: result,
-    start,
-    length: end - start,
+    children: result.flat(),
+    ...toLoC({ end, start }),
   })
 )

@@ -1,29 +1,13 @@
 import { Generator } from './generator.ts'
-import { Document, List, BlockQuote } from './ast.ts'
-import {
-  keyword,
-  many,
-  or,
-  seq,
-  option,
-  map,
-  atLeast,
-  EOS,
-  tap,
-  lazy,
-  char,
-} from './parser-combinator.ts'
-import { TODO } from './parsers/todo.ts'
-import { listItemParser } from './parsers/list-item.ts'
-import { atxHeadingParser } from './parsers/atx-heading.ts'
-import { setextHeadingParser } from './parsers/setext-heading.ts'
+import { Document } from './ast.ts'
+import { tap, many, or, seq, map, EOS } from './parser-combinator.ts'
+import { leafBlockParser } from './parsers/leaf-block.ts'
+import { containerBlockParser } from './parsers/container-block.ts'
+import { blockQuoteParser } from './parsers/block-quote.ts'
+import { listParser } from './parsers/list.ts'
 import { codeBlockParser } from './parsers/code-block.ts'
+import { emptyLineParser } from './parsers/empty-line.ts'
 import { thematicBreakParser } from './parsers/thematic-break.ts'
-import { SOL } from './parsers/sol.ts'
-import { anyWhitespaces } from './parsers/whitespaces.ts'
-import { lineEnding } from './parsers/line-ending.ts'
-import { paragraphParser } from './parsers/paragraph.ts'
-import { C_SPACE } from './scanner.ts'
 
 type Option = {}
 type StringifyOption = {}
@@ -31,58 +15,22 @@ type Result = {
   html: string
 }
 
-const blockQuoteParser = lazy(() =>
-  map(
-    tap(
-      'block_quote',
-      atLeast(seq(keyword('>'), char(C_SPACE), blockParser), 1)
-    ),
-    (r, end, start): BlockQuote => ({
-      type: 'block_quote',
-      children: r.map(([_mark, _space, content]) => content),
-      start,
-      length: end - start,
-    })
-  )
-)
-
-const listParser = map(
-  tap('list', atLeast(listItemParser, 1)),
-  (r, end, start): List => ({
-    type: 'list',
-    listType: r[0].marker.type,
-    children: r,
-    start,
-    length: end - start,
-  })
-)
-
-const htmlBlockParser = TODO('htmlBlock')
-
-const headingParser = or(atxHeadingParser, setextHeadingParser)
-
-const emptyLine = map(
-  seq(SOL(), anyWhitespaces, lineEnding),
-  (_, end, start) => ({
-    type: 'empty_line',
-    start,
-    length: end - start,
-  })
-)
-
 export const blockParser = or(
   blockQuoteParser,
-  // listItemParser,
+  thematicBreakParser, // FIXME: Merge to leadBlockParser
   listParser,
   codeBlockParser,
   // headingParser,
   // thematicBreakParser
   // paragraphParser,
-  emptyLine
+  leafBlockParser
 )
 
 export const documentParser = map(
-  seq(many(blockParser), EOS()),
+  seq(
+    many(tap('document > blockParser', blockParser)),
+    tap('document > EOS', EOS())
+  ),
   ([children]) => ({
     type: 'document',
     children,
@@ -116,16 +64,17 @@ export const documentParser = map(
 // Deno.exit(0)
 
 function tabToSpaces(str: string, tabStop: number): string {
+  const convertToSpaces = (matchedEntire: string, matched: string) => {
+    let start = matchedEntire.indexOf(matched)
+    if (start === -1) {
+      start = 0
+    }
+    const spaces = tabStop - (start % tabStop)
+    return matchedEntire.replace(matched, ' '.repeat(spaces))
+  }
   let tmp = str
   while (1) {
-    const result = tmp.replace(/^>\s*(\t)/gm, (matchedEntire, matched) => {
-      let start = matchedEntire.indexOf(matched)
-      if (start === -1) {
-        start = 0
-      }
-      const spaces = tabStop - (start % tabStop)
-      return matchedEntire.replace(matched, ' '.repeat(spaces))
-    })
+    const result = tmp.replace(/^[->]?\s*(\t)/gm, convertToSpaces)
     if (tmp === result) {
       break
     }
@@ -152,7 +101,7 @@ export async function parse(
 ): Promise<Document> {
   const [parsed, doc, pos] = documentParser(markdown, 0) as any
   if (pos !== markdown.length) {
-    console.log([markdown], doc, pos, markdown.length)
+    // console.log([markdown], doc, pos, markdown.length)
     throw new Error(`Unexpected token: "${markdown.slice(pos, pos + 1)}"`)
   }
   return doc
