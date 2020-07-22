@@ -10,9 +10,9 @@ import { lineEnding } from './line-ending.ts'
 
 // https://spec.commonmark.org/0.29/#leaf-blocks
 export const leafBlockParser = or(
+  atxHeadingParser,
   setextHeadingParser,
   thematicBreakParser,
-  atxHeadingParser,
   indentedCodeBlockParser,
   // fencedCodeBlockParser,
   // TODO: html block

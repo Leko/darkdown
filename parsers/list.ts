@@ -89,17 +89,7 @@ export const listItemParser = lazy(() =>
       indent: r[1].length,
       marker: r[2],
       children: r[4],
-      // r
-      //   .slice(4)
-      //   .filter(
-      //     (el: TODO<'Strongly typed'>) =>
-      //       !(Array.isArray(el) && el[0] === null && el[1] === C_NEWLINE)
-      //   ),
       ...toLoC({ end, start }),
     })
   )
 )
-
-// console.log(JSON.stringify(listParser('- hoge\n\n\t\tbar\n', 0), null, 2))
-
-// Deno.exit(0)

@@ -1,4 +1,5 @@
 import { C_NEWLINE } from '../scanner.ts'
+import { lastIndexOf } from '../util/last-index-of.ts'
 import {
   atLeast,
   until,
@@ -35,7 +36,7 @@ export const indentedCodeBlockParser = map(
       many(
         or(
           tap(
-            'indented_code_block > space[0-3]+empty',
+            'indented_code_block>space[0-3]+empty',
             map(seq(between(space, 0, 3), lineEnding), () => '')
           ),
           line
@@ -43,11 +44,21 @@ export const indentedCodeBlockParser = map(
       )
     )
   ),
-  (r, end, start): CodeBlock => ({
-    type: 'code_block',
-    text: [r[0], ...r[1]].join(C_NEWLINE) + C_NEWLINE,
-    language: null,
-    info: null,
-    ...toLoC({ end, start }),
-  })
+  (r, end, start): CodeBlock => {
+    const lines = [r[0], ...r[1]]
+    const startIndex = lines.findIndex((line) => line !== '')
+    const endIndex = lastIndexOf(lines, (line) => line !== '')
+    const contentLines = lines.slice(
+      startIndex === -1 ? 0 : startIndex,
+      endIndex === -1 ? lines.length : endIndex
+    )
+
+    return {
+      type: 'code_block',
+      text: contentLines.join(C_NEWLINE) + C_NEWLINE,
+      language: null,
+      info: null,
+      ...toLoC({ end, start }),
+    }
+  }
 )

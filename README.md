@@ -1,23 +1,53 @@
-# deno-plugin-study
+# darkdown
 
-Example of a Deno plugin using a third party crate.
+Markdown parser for Deno
+
+- :sparkles: Written in ES Modules
+- :heavy_check_mark: 100% compatible with [CommonMark spec](https://spec.commonmark.org/0.29/) (see [our tests](https://github.com/Leko/darkdown/blob/master/commonmark.test.ts))
+- :revolving_hearts: [GitHub flavored markdown](https://github.github.com/gfm/) is also supported
+- :boom: AST structure is the same as [remark](https://github.com/remarkjs/remark)
 
 ## Getting started
 
+### CommonMark
+
+```ts
+import {
+  parse,
+  stringify,
+  renderHTML,
+  transform,
+} from 'https://denopkg.com/Leko/darkdown/commonmark.ts'
+
+const ast = parse('# markdown')
+const markdown = stringify(ast) // => "# markdown"
+const html = renderHTML(ast) // => "<h1>markdown</h1>"
+
+const html = transform('# markdown') // => "<h1>markdown</h1>
 ```
-cargo build
-deno run --unstable --allow-plugin --allow-read --allow-write lib.ts
+
+### GitHub flavored markdown
+
+```ts
+import {
+  parse,
+  stringify,
+  transform,
+} from 'https://denopkg.com/Leko/darkdown/gfm.ts'
+
+// You can use the same as commonmark.ts
 ```
 
-## See also
+## Development
 
-- [plugin_prepare](https://deno.land/x/plugin_prepare)
-  - Utility for loading plugin
-- [denoland/deno/test_plugin](https://github.com/denoland/deno/tree/master/test_plugin)
-  - Officially provided example plugin and TypeScript tests
-
-## Testing
+### Test
 
 ```
-deno test --allow-read=spec.json darkdown.test.ts
+deno test --allow-read=./fixtures/commonmark-0.29-spec.json
+```
+
+### Update spec file
+
+```
+
 ```

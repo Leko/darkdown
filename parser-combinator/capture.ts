@@ -16,8 +16,7 @@ export const capture = <T, P, S>(
       }
       return result
     },
-    ifMatch: (callback) => (input: string, pos: number) => {
-      return callback(parseResult)(input, pos)
-    },
+    ifMatch: (callback) => (input: string, pos: number) =>
+      callback(parseResult)(input, pos),
   })
 }

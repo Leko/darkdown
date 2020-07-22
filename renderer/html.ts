@@ -58,7 +58,8 @@ export class HtmlRenderer {
   }
 
   private renderCodeBlock(node: CodeBlock): string {
-    return `<pre><code>${escapeHTML(node.text)}</code></pre>`
+    const lang = node.language ? ` class="language-${node.language}"` : ''
+    return `<pre><code${lang}>${escapeHTML(node.text)}</code></pre>`
   }
 
   private renderList(node: List): string {
