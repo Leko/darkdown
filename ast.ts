@@ -33,22 +33,14 @@ export type Strong = ASTText<{
 export type Code = ASTText<{
   type: 'code'
 }>
-export type HTMLInline = ASTText<{
-  type: 'html_inline'
+export type HTML = ASTText<{
+  type: 'html'
 }>
 
 // It's not defined in spec
 export type Str = ASTNode<{
   type: 'str'
-  children: (
-    | Text
-    | SoftBreak
-    | LineBreak
-    | Emphasis
-    | Strong
-    | Code
-    | HTMLInline
-  )[]
+  children: (Text | SoftBreak | LineBreak | Emphasis | Strong | Code | HTML)[]
 }>
 
 export type EmptyLine = ASTNode<{
@@ -133,6 +125,7 @@ export type FIXME_All_Nodes =
   | Str
   | EmptyLine
   | Link
+  | HTML
   | Image
   | Paragraph
   | BlockQuote

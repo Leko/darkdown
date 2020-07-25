@@ -61,8 +61,6 @@ export const setextHeadingParser: Parser<Heading> = map(
     )
   ),
   (r, end, start): Heading => ({
-    // @ts-ignore
-    _: console.log(r),
     type: 'heading',
     children: r[0].flatMap((rr: any) => rr.slice(2)).slice(0, -1),
     level: r[3][0] === '=' ? 1 : 2,

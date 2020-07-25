@@ -36,32 +36,6 @@ export const documentParser = map(
   })
 )
 
-// console.log('Hi!')
-// // console.log('thematic Break(*)', thematicBreakParser('***', 0))
-// // console.log('thematic Break(-)', thematicBreakParser('---', 0))
-// // console.log('thematic Break(_)', thematicBreakParser('___', 0))
-// // console.log('Heading(1)', headingParser('# hoge', 0))
-// // console.log('Heading(2)', headingParser('## hoge', 0))
-// // console.log('Heading(6)', headingParser('###### hoge', 0))
-// // console.log('Not heading(7)', headingParser('####### hoge', 0))
-// console.log(
-//   'link reference',
-//   linkDefinitionParser(
-//     `[foo]: /url "title"
-
-// [foo]`,
-//     0
-//   )
-// )
-// console.log('list_marker', listMarker('    * ', 0))
-// console.log('list_marker', listMarker('    - ', 0))
-// console.log('list_marker', listMarker('    1.', 0))
-// console.log('list_marker', listMarker('    2.', 0))
-// console.log(documentParser('  - foo\n\n', 0))
-
-// console.log('Done!')
-// Deno.exit(0)
-
 function tabToSpaces(str: string, tabStop: number): string {
   const convertToSpaces = (matchedEntire: string, matched: string) => {
     let start = matchedEntire.replace(/^\n+/, '').indexOf(matched)

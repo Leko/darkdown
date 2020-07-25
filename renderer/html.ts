@@ -13,6 +13,7 @@ import {
   Emphasis,
   Strong,
   Code,
+  HTML,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -42,6 +43,8 @@ export class HtmlRenderer {
         return this.renderParagraph(node)
       case 'heading':
         return this.renderHeading(node)
+      case 'html':
+        return this.renderHTML(node)
       case 'str':
         return this.renderString(node)
       case 'empty_line':
@@ -116,11 +119,17 @@ export class HtmlRenderer {
             return this.renderEmphasis(child)
           case 'strong':
             return this.renderStrong(child)
+          case 'html':
+            return this.renderHTML(child)
           default:
             throw new Error(`Unexpected type: ${JSON.stringify(child)}`)
         }
       })
       .join(' ')
+  }
+
+  private renderHTML(node: HTML): string {
+    return node.text
   }
 
   private renderCode(node: Code): string {

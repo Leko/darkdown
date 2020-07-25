@@ -7,54 +7,22 @@ import {
 } from '../scanner.ts'
 import {
   keyword,
-  until,
   map,
   or,
   seq,
-  lazy,
   atLeast,
   tap,
   not,
   EOS,
-  nor,
   option,
   matchOnly,
   Parser,
 } from '../parser-combinator.ts'
 import { toLoC } from './loc.ts'
-import { TODO } from './todo.ts'
 import { lineEnding } from './line-ending.ts'
-import { Str, Text, Emphasis, Strong, Code } from '../ast.ts'
-
-const END = nor(lineEnding, EOS())
-
-const asText = <T>(parser: Parser<T>) =>
-  map(
-    parser,
-    (r, end, start): Text => ({
-      type: 'text',
-      text: r as any,
-      ...toLoC({ end, start }),
-    })
-  )
-
-export const textParser = (except?: Parser<any>) =>
-  map(
-    tap(
-      'text',
-      atLeast(nor(...[except as any, lineEnding, EOS()].filter(Boolean)), 1)
-    ),
-    (r, end, start): Text => ({
-      type: 'text',
-      text: r
-        .join('')
-        // FIXME: Is it right handling?
-        .replace(/\\#/g, '#') // case 35
-        .replace(/\\>/g, '>') // case 72
-        .replace(/\\-/g, '-'), // case 76
-      ...toLoC({ end, start }),
-    })
-  )
+import { htmlParser } from './html.ts'
+import { Str, Emphasis, Strong, Code } from '../ast.ts'
+import { textParser } from './text.ts'
 
 const softbreakParser = keyword(C_SPACE)
 
@@ -132,8 +100,6 @@ const codeParser: Parser<Code> = map(
   })
 )
 
-// const htmlInlineParser = TODO('HTML inline')
-
 export const strParser = ({ except }: { except?: Parser<any> } = {}): Parser<
   Str
 > =>
@@ -145,7 +111,7 @@ export const strParser = ({ except }: { except?: Parser<any> } = {}): Parser<
         strongParser,
         emphParser,
         codeParser,
-        // htmlInlineParser
+        htmlParser,
         textParser(except)
       ),
       1
