@@ -43,6 +43,13 @@ export type Str = ASTNode<{
   children: (Text | SoftBreak | LineBreak | Emphasis | Strong | Code | HTML)[]
 }>
 
+// FIXME: Is it ASTNode?
+export type LinkReferenceDefinition = ASTText<{
+  type: 'link_reference_definition'
+  url: string
+  title: string
+}>
+
 export type EmptyLine = ASTNode<{
   type: 'empty_line'
   children: never[]
@@ -135,6 +142,7 @@ export type FIXME_All_Nodes =
   | CodeBlock
   | HTMLBlock
   | ThematicBreak
+  | LinkReferenceDefinition
 
 //-----------------------------------------
 //-----------------------------------------

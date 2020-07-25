@@ -59,7 +59,7 @@ const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
-const tests = omit(suite.slice(0, 160), SKIP_CASES)
+const tests = omit(suite.slice(0, 172), SKIP_CASES)
 
 // SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
 //   const testName = JSON.stringify(spec.markdown)

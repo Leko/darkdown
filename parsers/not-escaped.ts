@@ -5,9 +5,6 @@ export const notEscaped = <T>(
   parser: Parser<T>,
   option?: { escapeSeq?: string }
 ) => {
-  if (option?.escapeSeq) {
-    throw new Error('escapeSeq option is not supported yet')
-  }
   const escapeSeq = option?.escapeSeq ?? C_BACK_SLASH
 
   return (input: string, pos: number): ParseResult<T> | ParseFailed => {
@@ -18,7 +15,8 @@ export const notEscaped = <T>(
           `notEscaped must be returned string, but got ${typeof result[1]}`
         )
       }
-      const beforeChar = input.slice(result[2] - escapeSeq.length, result[2])
+      const endPos = result[2] - result[1].length
+      const beforeChar = input.slice(endPos - escapeSeq.length, endPos)
       if (beforeChar !== escapeSeq) {
         return result
       }

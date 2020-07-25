@@ -21,7 +21,6 @@ import {
   repeatIntercept,
   Parser,
 } from '../parser-combinator.ts'
-import { linkDefinitionParser } from '../parsers/link-definition.ts'
 import { strParser } from '../parsers/str.ts'
 import { Paragraph, Str } from '../ast.ts'
 import { toLoC } from './loc.ts'

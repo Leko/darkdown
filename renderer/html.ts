@@ -14,6 +14,7 @@ import {
   Strong,
   Code,
   HTML,
+  LinkReferenceDefinition,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -49,6 +50,8 @@ export class HtmlRenderer {
         return this.renderString(node)
       case 'empty_line':
         return C_NEWLINE
+      case 'link_reference_definition':
+        return this.renderLinkReferenceDefinition(node)
       default:
         throw new Error(`Unexpected node: ${JSON.stringify(node, null, 2)}`)
     }
@@ -86,9 +89,19 @@ export class HtmlRenderer {
 
   private renderHeading(node: Heading): string {
     const tag = `h${node.level}`
-    return `<${tag}>${node.children
-      .map((c) => this.renderString(c))
-      .join('')}</${tag}>`
+    return `<${tag}>${escapeHTML(
+      node.children.map((c) => this.renderString(c)).join('')
+    )}</${tag}>`
+  }
+
+  private renderLinkReferenceDefinition(node: LinkReferenceDefinition): string {
+    // Case 171: Both title and destination can contain backslash escapes and literal backslashes
+    const processBackSlash = (str: string): string =>
+      str?.replace(/\\([^a-zA-Z0-9])/g, '$1') ?? str
+
+    return `<p><a href="${encodeURI(processBackSlash(node.url))}"${
+      node.title ? ` title="${escapeHTML(processBackSlash(node.title))}"` : ''
+    }>${node.text}</a></p>`
   }
 
   private renderThematicBreak(_: ThematicBreak): string {
@@ -107,8 +120,13 @@ export class HtmlRenderer {
       .map((child) => {
         switch (child.type) {
           case 'text':
-            // FIXME: Move to heading parser (case 37)
-            return escapeHTML(child.text.replace(/ +$/, ''))
+            return (
+              child.text
+                // FIXME: Move it to heading parser (case 37)
+                .replace(/ +$/, '')
+                // FIXME: Fix the rule for escaping in paragraph (case 61)
+                .replaceAll('"/>', '&quot;/&gt;')
+            )
           case 'softbreak':
             return '\n'
           case 'linebreak':
