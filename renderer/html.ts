@@ -17,6 +17,7 @@ import {
   LinkReference,
   LinkDefinition,
   Text,
+  ASTNode,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -64,9 +65,12 @@ export class HtmlRenderer {
   }
 
   private renderBlockQuote(node: BlockQuote, doc: Document): string {
-    return `<blockquote>\n${node.children.map((c) =>
-      this.renderNode(c, doc)
-    )}\n</blockquote>`
+    const content = node.children
+      .map((c) => this.renderNode(c, doc))
+      .filter(Boolean)
+    return `<blockquote>${
+      content.length > 0 ? `\n${content.join('')}` : ''
+    }\n</blockquote>`
   }
 
   private renderCodeBlock(node: CodeBlock, doc: Document): string {
@@ -101,9 +105,7 @@ export class HtmlRenderer {
   }
 
   private renderLinkReference(node: LinkReference, doc: Document): string {
-    const definition = doc.children.find(
-      (n) => n.type === 'link_definition' && n.identifier === node.identifier
-    ) as LinkDefinition | undefined
+    const definition = this.findLinkDefinition(node.identifier, doc)
     if (!definition) {
       return `[${node.text}]`
     }
@@ -186,5 +188,21 @@ export class HtmlRenderer {
     const prefix = str.startsWith('<') ? '\n' : ''
     const suffix = str.trim().endsWith('>') ? '\n' : ''
     return prefix + str + suffix
+  }
+
+  private findLinkDefinition(
+    identifier: string,
+    node: Document | FIXME_All_Nodes
+  ): LinkDefinition | undefined {
+    if (node.type === 'link_definition' && node.identifier === identifier) {
+      return node as LinkDefinition
+    }
+    const children: FIXME_All_Nodes[] = (node as any).children || []
+    for (let child of children) {
+      const found = this.findLinkDefinition(identifier, child)
+      if (found) {
+        return found
+      }
+    }
   }
 }

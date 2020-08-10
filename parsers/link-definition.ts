@@ -42,7 +42,6 @@ export const linkDefinitionParser = map(
   tap(
     'link_definition',
     seq(
-      tap('link_definition>SOL', SOL()),
       tap('link_definition>spaces', between(space, 0, 3)),
       map(
         tap(
@@ -118,15 +117,15 @@ export const linkDefinitionParser = map(
     )
   ),
   (r, end, start): LinkDefinition => {
-    const label = r[2].replaceAll(
+    const label = r[1].replaceAll(
       C_BACK_SLASH + C_CLOSE_BRACKET,
       C_CLOSE_BRACKET
     )
     return {
       type: 'link_definition',
       identifier: label.toLocaleLowerCase(),
-      url: r[4],
-      title: r[5],
+      url: r[3],
+      title: r[4],
       label,
       children: [],
       ...toLoC({ end, start }),
