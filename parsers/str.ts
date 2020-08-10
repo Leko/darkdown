@@ -17,12 +17,15 @@ import {
   option,
   matchOnly,
   Parser,
+  repeatIntercept,
 } from '../parser-combinator.ts'
 import { toLoC } from './loc.ts'
 import { lineEnding } from './line-ending.ts'
 import { htmlParser } from './html.ts'
 import { Str, Emphasis, Strong, Code } from '../ast.ts'
 import { textParser } from './text.ts'
+import { linkReferenceParser } from './link-reference.ts'
+import { emptyLineParser } from './empty-line.ts'
 
 const softbreakParser = keyword(C_SPACE)
 
@@ -104,17 +107,20 @@ export const strParser = ({ except }: { except?: Parser<any> } = {}): Parser<
   Str
 > =>
   map(
-    atLeast(
-      or(
-        // softbreakParser,
-        // linebreakParser,
-        strongParser,
-        emphParser,
-        codeParser,
-        htmlParser,
-        textParser(except)
-      ),
-      1
+    repeatIntercept({ atLeast: 1, intercepter: emptyLineParser })(
+      tap(
+        'str>or',
+        or(
+          // softbreakParser,
+          // linebreakParser,
+          linkReferenceParser,
+          strongParser,
+          emphParser,
+          codeParser,
+          htmlParser,
+          textParser(except)
+        )
+      )
     ),
     (r, end, start): Str => ({
       type: 'str',

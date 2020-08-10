@@ -1,4 +1,4 @@
-import escapeHTML from 'https://deno.land/x/lodash/escape.js'
+import escapeHTML from 'https://deno.land/x/lodash@4.17.15-es/escape.js'
 import {
   Document,
   CodeBlock,
@@ -14,7 +14,8 @@ import {
   Strong,
   Code,
   HTML,
-  LinkReferenceDefinition,
+  LinkReference,
+  LinkDefinition,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -22,100 +23,114 @@ export type Option = {}
 
 export class HtmlRenderer {
   render(doc: Document, _options: Option): string {
+    const ignoredTypes: FIXME_All_Nodes['type'][] = [
+      'empty_line',
+      'link_definition',
+    ]
     return (
       doc.children
-        .filter((c) => c.type !== 'empty_line')
-        .map((c) => this.renderNode(c))
+        .filter((c) => !ignoredTypes.includes(c.type))
+        .map((c) => this.renderNode(c, doc))
         .join('\n') + '\n'
-    )
+    ).trimStart()
   }
 
-  private renderNode(node: FIXME_All_Nodes): string {
+  private renderNode(node: FIXME_All_Nodes, doc: Document): string {
     switch (node.type) {
       case 'code_block':
-        return this.renderCodeBlock(node)
+        return this.renderCodeBlock(node, doc)
       case 'list':
-        return this.renderList(node)
+        return this.renderList(node, doc)
       case 'block_quote':
-        return this.renderBlockQuote(node)
+        return this.renderBlockQuote(node, doc)
       case 'thematic_break':
         return this.renderThematicBreak(node)
       case 'paragraph':
-        return this.renderParagraph(node)
+        return this.renderParagraph(node, doc)
       case 'heading':
-        return this.renderHeading(node)
+        return this.renderHeading(node, doc)
       case 'html':
         return this.renderHTML(node)
       case 'str':
-        return this.renderString(node)
+        return this.renderString(node, doc)
       case 'empty_line':
         return C_NEWLINE
-      case 'link_reference_definition':
-        return this.renderLinkReferenceDefinition(node)
+      case 'link_definition':
+        return ''
       default:
         throw new Error(`Unexpected node: ${JSON.stringify(node, null, 2)}`)
     }
   }
 
-  private renderBlockQuote(node: BlockQuote): string {
+  private renderBlockQuote(node: BlockQuote, doc: Document): string {
     return `<blockquote>\n${node.children.map((c) =>
-      this.renderNode(c)
+      this.renderNode(c, doc)
     )}\n</blockquote>`
   }
 
-  private renderCodeBlock(node: CodeBlock): string {
+  private renderCodeBlock(node: CodeBlock, doc: Document): string {
     const lang = node.language ? ` class="language-${node.language}"` : ''
     return `<pre><code${lang}>${escapeHTML(node.text)}</code></pre>`
   }
 
-  private renderList(node: List): string {
+  private renderList(node: List, doc: Document): string {
     const tag = node.listType === 'bullet_list_marker' ? 'ul' : 'ol'
     return `<${tag}>\n${node.children
-      .map((c) => this.renderListItem(c))
+      .map((c) => this.renderListItem(c, doc))
       .join(
         // FIXME: It may cause a problem.
         '\n'
       )}\n</${tag}>`
   }
 
-  private renderListItem(node: ListItem): string {
+  private renderListItem(node: ListItem, doc: Document): string {
     if (!node.children.map) {
       console.log(node)
     }
     return `<li>${this.breakIfBlock(
-      node.children.map((c) => this.renderNode(c)).join('')
+      node.children.map((c) => this.renderNode(c, doc)).join('')
     )}</li>`
   }
 
-  private renderHeading(node: Heading): string {
+  private renderHeading(node: Heading, doc: Document): string {
     const tag = `h${node.level}`
     return `<${tag}>${escapeHTML(
-      node.children.map((c) => this.renderString(c)).join('')
+      node.children.map((c) => this.renderString(c, doc)).join('')
     )}</${tag}>`
   }
 
-  private renderLinkReferenceDefinition(node: LinkReferenceDefinition): string {
+  private renderLinkReference(node: LinkReference, doc: Document): string {
+    const definition = doc.children.find(
+      (n) =>
+        n.type === 'link_definition' &&
+        n.label.toLocaleUpperCase() === node.text.toLocaleUpperCase()
+    ) as LinkDefinition | undefined
+    if (!definition) {
+      return `[${node.text}]`
+    }
+
     // Case 171: Both title and destination can contain backslash escapes and literal backslashes
     const processBackSlash = (str: string): string =>
       str?.replace(/\\([^a-zA-Z0-9])/g, '$1') ?? str
-
-    return `<p><a href="${encodeURI(processBackSlash(node.url))}"${
-      node.title ? ` title="${escapeHTML(processBackSlash(node.title))}"` : ''
-    }>${node.text}</a></p>`
+    const url = encodeURI(processBackSlash(definition.url))
+    const title = definition.title
+      ? ` title="${escapeHTML(processBackSlash(definition.title))}"`
+      : ''
+    return `<a href="${url}"${title}>${node.text}</a>`
   }
 
   private renderThematicBreak(_: ThematicBreak): string {
     return `<hr />`
   }
 
-  private renderParagraph(node: Paragraph): string {
+  private renderParagraph(node: Paragraph, doc: Document): string {
     return `<p>${node.children
-      .map((c) => this.renderString(c))
+      .map((c) => this.renderString(c, doc))
       .join('')
       .trimEnd()}</p>`
   }
 
-  private renderString(node: Str): string {
+  private renderString(node: Str, doc: Document): string {
     return node.children
       .map((child) => {
         switch (child.type) {
@@ -126,6 +141,10 @@ export class HtmlRenderer {
                 .replace(/ +$/, '')
                 // FIXME: Fix the rule for escaping in paragraph (case 61)
                 .replaceAll('"/>', '&quot;/&gt;')
+                // FIXME: case 178
+                .replace(/^"/g, '&quot;')
+                .replaceAll(' "', ' &quot;')
+                .replaceAll('" ', '&quot; ')
             )
           case 'softbreak':
             return '\n'
@@ -139,6 +158,8 @@ export class HtmlRenderer {
             return this.renderStrong(child)
           case 'html':
             return this.renderHTML(child)
+          case 'link_reference':
+            return this.renderLinkReference(child, doc)
           default:
             throw new Error(`Unexpected type: ${JSON.stringify(child)}`)
         }

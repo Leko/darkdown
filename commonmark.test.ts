@@ -2,12 +2,11 @@ import {
   assertEquals,
   assertNotEquals,
 } from 'https://deno.land/std/testing/asserts.ts'
-import { readFileStr } from 'https://deno.land/std/fs/read_file_str.ts'
 import { transform } from './commonmark.ts'
-import range from 'https://deno.land/x/lodash/range.js'
+import range from 'https://deno.land/x/lodash@4.17.15-es/range.js'
 
 const suite = JSON.parse(
-  await readFileStr('./fixtures/commonmark-0.29-spec.json')
+  await Deno.readTextFile('./fixtures/commonmark-0.29-spec.json')
 )
 
 type Spec = {
@@ -53,21 +52,24 @@ const SKIP_CASES = [
   115,
   117,
   // TODO: HTML block
-  ...range(118, 161, 1),
+  ...range(118, 144, 1),
+  ...range(145, 156, 1),
+  ...range(157, 161, 1),
 ]
 const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
-const tests = omit(suite.slice(0, 172), SKIP_CASES)
+// const tests = omit(suite.slice(60, 61), SKIP_CASES)
+const tests = omit(suite.slice(0, 182), SKIP_CASES)
 
-// SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
-//   const testName = JSON.stringify(spec.markdown)
-//   Deno.test(`FAIL [${spec.example}] ${testName}`, async () => {
-//     const { html } = await transform(spec.markdown, {})
-//     assertNotEquals(html, spec.html)
-//   })
-// })
+SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
+  const testName = JSON.stringify(spec.markdown)
+  Deno.test(`FAIL [${spec.example}] ${testName}`, async () => {
+    const { html } = await transform(spec.markdown, {})
+    assertNotEquals(html, spec.html)
+  })
+})
 
 tests.forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)

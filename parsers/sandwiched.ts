@@ -1,4 +1,4 @@
-import { Parser, keyword, until, seq, or } from '../parser-combinator.ts'
+import { Parser, keyword, until, seq, or, tap } from '../parser-combinator.ts'
 import { notEscaped } from './not-escaped.ts'
 
 export const sandwiched = <T>(
@@ -7,11 +7,14 @@ export const sandwiched = <T>(
   option?: { intercept?: Parser<T>; escapeSeq?: string }
 ): Parser<[string, string, string]> =>
   seq(
-    keyword(startChar),
-    until(
-      option?.intercept
-        ? or(option?.intercept, notEscaped(keyword(endChar), option))
-        : notEscaped(keyword(endChar), option)
+    tap(`sandwiched>START(${startChar})`, keyword(startChar)),
+    tap(
+      `sandwiched>CONTENT`,
+      until(
+        option?.intercept
+          ? or(option?.intercept, notEscaped(keyword(endChar), option))
+          : notEscaped(keyword(endChar), option)
+      )
     ),
-    keyword(endChar)
+    tap(`sandwiched>END(${endChar})`, keyword(endChar))
   ) as Parser<[string, string, string]>

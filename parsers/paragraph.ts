@@ -26,6 +26,7 @@ import { Paragraph, Str } from '../ast.ts'
 import { toLoC } from './loc.ts'
 import { lineEnding } from './line-ending.ts'
 import { thematicBreakParser } from './thematic-break.ts'
+import { emptyLineParser } from './empty-line.ts'
 
 export const linkParser = seq(
   keyword(C_OPEN_BRACKET),
@@ -60,12 +61,18 @@ export const paragraphParser: Parser<Paragraph> = map(
   tap(
     'paragraph',
     repeatIntercept({
-      intercepter: thematicBreakParser,
+      intercepter: tap(
+        'paragrah>intercepter',
+        or(
+          tap('paragrah>thematicBreak', thematicBreakParser),
+          tap('paragrah>emptyLine', emptyLineParser)
+        )
+      ),
       atLeast: 1,
     })(
       seq(
         or(
-          map(strParser(), (r) => ({
+          map(tap('paragraph>str', strParser()), (r) => ({
             ...r,
             children: [
               // Trim leading whitespaces
@@ -73,12 +80,11 @@ export const paragraphParser: Parser<Paragraph> = map(
               ...r.children.slice(1),
             ],
           }))
-          // linkDefinitionParser,
           // linkParser,
           // imageParser
         ),
         map(
-          option(or(lineEnding, EOS())),
+          tap('paragraph>option', option(or(lineEnding, EOS()))),
           // FIXME: Is it "Str"? It's keyword I think.
           (r, end, start): Str => ({
             type: 'str',

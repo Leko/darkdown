@@ -6,7 +6,7 @@ import { indentedCodeBlockParser } from './indented-code-block.ts'
 import { paragraphParser } from './paragraph.ts'
 import { emptyLineParser } from './empty-line.ts'
 import { htmlParser } from './html.ts'
-import { linkReferenceDefinitionParser } from '../parsers/link-reference-definition.ts'
+import { linkDefinitionParser } from '../parsers/link-definition.ts'
 
 // https://spec.commonmark.org/0.29/#leaf-blocks
 export const leafBlockParser = or(
@@ -16,7 +16,7 @@ export const leafBlockParser = or(
   indentedCodeBlockParser,
   // fencedCodeBlockParser,
   // TODO: html block
-  linkReferenceDefinitionParser,
+  linkDefinitionParser,
   htmlParser,
   paragraphParser,
   emptyLineParser

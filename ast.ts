@@ -36,18 +36,31 @@ export type Code = ASTText<{
 export type HTML = ASTText<{
   type: 'html'
 }>
+export type LinkReference = ASTText<{
+  type: 'link_reference'
+}>
 
 // It's not defined in spec
 export type Str = ASTNode<{
   type: 'str'
-  children: (Text | SoftBreak | LineBreak | Emphasis | Strong | Code | HTML)[]
+  children: (
+    | Text
+    | SoftBreak
+    | LineBreak
+    | Emphasis
+    | Strong
+    | Code
+    | HTML
+    | LinkReference
+  )[]
 }>
 
-// FIXME: Is it ASTNode?
-export type LinkReferenceDefinition = ASTText<{
-  type: 'link_reference_definition'
+export type LinkDefinition = ASTNode<{
+  type: 'link_definition'
+  label: string
   url: string
   title: string
+  children: never[]
 }>
 
 export type EmptyLine = ASTNode<{
@@ -142,11 +155,7 @@ export type FIXME_All_Nodes =
   | CodeBlock
   | HTMLBlock
   | ThematicBreak
-  | LinkReferenceDefinition
-
-//-----------------------------------------
-//-----------------------------------------
-//-----------------------------------------
+  | LinkDefinition
 
 export type Document = ASTNode<{
   type: 'document'
