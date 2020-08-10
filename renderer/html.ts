@@ -16,6 +16,7 @@ import {
   HTML,
   LinkReference,
   LinkDefinition,
+  Text,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -94,16 +95,14 @@ export class HtmlRenderer {
 
   private renderHeading(node: Heading, doc: Document): string {
     const tag = `h${node.level}`
-    return `<${tag}>${escapeHTML(
-      node.children.map((c) => this.renderString(c, doc)).join('')
-    )}</${tag}>`
+    return `<${tag}>${node.children
+      .map((c) => this.renderString(c, doc))
+      .join('')}</${tag}>`
   }
 
   private renderLinkReference(node: LinkReference, doc: Document): string {
     const definition = doc.children.find(
-      (n) =>
-        n.type === 'link_definition' &&
-        n.label.toLocaleUpperCase() === node.text.toLocaleUpperCase()
+      (n) => n.type === 'link_definition' && n.identifier === node.identifier
     ) as LinkDefinition | undefined
     if (!definition) {
       return `[${node.text}]`
@@ -135,17 +134,7 @@ export class HtmlRenderer {
       .map((child) => {
         switch (child.type) {
           case 'text':
-            return (
-              child.text
-                // FIXME: Move it to heading parser (case 37)
-                .replace(/ +$/, '')
-                // FIXME: Fix the rule for escaping in paragraph (case 61)
-                .replaceAll('"/>', '&quot;/&gt;')
-                // FIXME: case 178
-                .replace(/^"/g, '&quot;')
-                .replaceAll(' "', ' &quot;')
-                .replaceAll('" ', '&quot; ')
-            )
+            return this.renderText(child)
           case 'softbreak':
             return '\n'
           case 'linebreak':
@@ -164,7 +153,17 @@ export class HtmlRenderer {
             throw new Error(`Unexpected type: ${JSON.stringify(child)}`)
         }
       })
-      .join(' ')
+      .join('')
+  }
+
+  private renderText(node: Text): string {
+    return (
+      escapeHTML(node.text)
+        // FIXME: Move it to heading parser (case 37)
+        .replace(/ +$/, '')
+        // case 166
+        .replaceAll('&#39;', "'")
+    )
   }
 
   private renderHTML(node: HTML): string {

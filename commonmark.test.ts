@@ -2,7 +2,7 @@ import {
   assertEquals,
   assertNotEquals,
 } from 'https://deno.land/std/testing/asserts.ts'
-import { transform } from './commonmark.ts'
+import { transform, parse, stringify } from './commonmark.ts'
 import range from 'https://deno.land/x/lodash@4.17.15-es/range.js'
 
 const suite = JSON.parse(
@@ -52,16 +52,16 @@ const SKIP_CASES = [
   115,
   117,
   // TODO: HTML block
-  ...range(118, 144, 1),
-  ...range(145, 156, 1),
-  ...range(157, 161, 1),
+  ...range(118, 161, 1),
+  // TODO: Inline HTML
+  170,
 ]
 const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
-// const tests = omit(suite.slice(60, 61), SKIP_CASES)
-const tests = omit(suite.slice(0, 182), SKIP_CASES)
+// const tests = omit(suite.slice(186, 187), SKIP_CASES)
+const tests = omit(suite.slice(0, 186), SKIP_CASES)
 
 SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)
@@ -74,7 +74,8 @@ SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
 tests.forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)
   Deno.test(`[${spec.example}] ${testName}`, async () => {
-    const { html } = await transform(spec.markdown, {})
+    const ast = await parse(spec.markdown, {})
+    const { html } = await stringify(ast, {})
     assertEquals(html, spec.html)
   })
 })

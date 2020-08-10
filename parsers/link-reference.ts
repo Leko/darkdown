@@ -29,13 +29,20 @@ export const linkReferenceParser = map(
         sandwiched(C_OPEN_BRACKET, C_CLOSE_BRACKET, {
           escapeSeq: C_BACK_SLASH,
         })
-      ),
-      matchOnly(lineEnding)
+      )
+      // matchOnly(lineEnding)
     )
   ),
-  (r, end, start): LinkReference => ({
-    type: 'link_reference',
-    text: r[1][1].replaceAll(C_BACK_SLASH + C_CLOSE_BRACKET, C_CLOSE_BRACKET),
-    ...toLoC({ end, start }),
-  })
+  (r, end, start): LinkReference => {
+    const text: string = r[1][1].replaceAll(
+      C_BACK_SLASH + C_CLOSE_BRACKET,
+      C_CLOSE_BRACKET
+    )
+    return {
+      type: 'link_reference',
+      text,
+      identifier: text.toLocaleLowerCase(),
+      ...toLoC({ end, start }),
+    }
+  }
 )

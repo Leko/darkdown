@@ -1,4 +1,5 @@
 import { HtmlRenderer, Option as StringifyOption } from './renderer/html.ts'
+import { Parser } from './parser-combinator/types.ts'
 import { Document } from './ast.ts'
 import { tap, many, or, seq, map, EOS } from './parser-combinator.ts'
 import { leafBlockParser } from './parsers/leaf-block.ts'
@@ -25,7 +26,8 @@ export const blockParser = or(
   leafBlockParser
 )
 
-export const documentParser = map(
+// @ts-expect-error
+export const documentParser: Parser<Document> = map(
   seq(
     many(tap('document > blockParser', blockParser)),
     tap('document > EOS', EOS())
@@ -69,22 +71,20 @@ export async function transform(
 ): Promise<Result> {
   const parseOption: ParseOption = { ...options.parseOption }
   const stringifyOption: StringifyOption = { ...options.stringifyOption }
-  console.log(
-    [markdown, tabToSpaces(markdown, 4)].map((c) => JSON.stringify(c))
-  )
-  // Deno.exit(0)
-  return parse(tabToSpaces(markdown, 4), parseOption).then((ast) =>
-    stringify(ast, stringifyOption)
-  )
+  return stringify(await parse(markdown, parseOption), stringifyOption)
 }
 
 export async function parse(
   markdown: string,
   options: ParseOption
 ): Promise<Document> {
-  const [parsed, doc, pos] = documentParser(markdown, 0) as any
-  if (pos !== markdown.length) {
-    // console.log([markdown], doc, pos, markdown.length)
+  const prettyMD = tabToSpaces(markdown, 4)
+  const result = documentParser(prettyMD, 0)
+  if (!result[0]) {
+    throw new Error(`Parse failed:\n${markdown}`)
+  }
+  const [,doc,pos] = result
+  if (pos !== prettyMD.length) {
     throw new Error(`Unexpected token: "${markdown.slice(pos, pos + 1)}"`)
   }
   return doc

@@ -10,13 +10,13 @@ import { linkDefinitionParser } from '../parsers/link-definition.ts'
 
 // https://spec.commonmark.org/0.29/#leaf-blocks
 export const leafBlockParser = or(
+  linkDefinitionParser,
   atxHeadingParser,
   setextHeadingParser,
   thematicBreakParser,
   indentedCodeBlockParser,
   // fencedCodeBlockParser,
   // TODO: html block
-  linkDefinitionParser,
   htmlParser,
   paragraphParser,
   emptyLineParser

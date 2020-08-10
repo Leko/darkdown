@@ -38,6 +38,7 @@ export type HTML = ASTText<{
 }>
 export type LinkReference = ASTText<{
   type: 'link_reference'
+  identifier: string
 }>
 
 // It's not defined in spec
@@ -57,6 +58,7 @@ export type Str = ASTNode<{
 
 export type LinkDefinition = ASTNode<{
   type: 'link_definition'
+  identifier: string
   label: string
   url: string
   title: string

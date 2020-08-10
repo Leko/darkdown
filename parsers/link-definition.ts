@@ -117,12 +117,19 @@ export const linkDefinitionParser = map(
       tap('link_definition>(emptyLine)', option(emptyLineParser))
     )
   ),
-  (r, end, start): LinkDefinition => ({
-    type: 'link_definition',
-    url: r[4],
-    title: r[5],
-    label: r[2].replaceAll(C_BACK_SLASH + C_CLOSE_BRACKET, C_CLOSE_BRACKET),
-    children: [],
-    ...toLoC({ end, start }),
-  })
+  (r, end, start): LinkDefinition => {
+    const label = r[2].replaceAll(
+      C_BACK_SLASH + C_CLOSE_BRACKET,
+      C_CLOSE_BRACKET
+    )
+    return {
+      type: 'link_definition',
+      identifier: label.toLocaleLowerCase(),
+      url: r[4],
+      title: r[5],
+      label,
+      children: [],
+      ...toLoC({ end, start }),
+    }
+  }
 )

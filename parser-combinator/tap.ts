@@ -11,16 +11,16 @@ export const tap = <T>(identifier: string, parser: Parser<T>) => (
   input: string,
   pos: number
 ): ParseResult<T> | ParseFailed => {
-  // return parser(input, pos)
+  return parser(input, pos)
 
   console.log(
     [identifier, `START: pos=${pos}`]
       .map(dim)
       .concat(
         (
-          dim(input.slice(0, pos)) +
+          dim(input.slice(Math.max(0, pos - 10), pos)) +
           underline(bold(input.slice(pos, pos + 1))) +
-          dim(input.slice(pos + 1))
+          dim(input.slice(pos + 1, Math.min(input.length, pos + 10)))
         )
           .replaceAll('\n', '\\n')
           .replaceAll('\t', '\\t')
@@ -36,9 +36,9 @@ export const tap = <T>(identifier: string, parser: Parser<T>) => (
         .map(green)
         .concat(
           (
-            dim(input.slice(0, pos)) +
+            dim(input.slice(Math.min(0, pos - 10), pos)) +
             underline(red(input.slice(pos, newPos))) +
-            dim(input.slice(newPos))
+            dim(input.slice(newPos, Math.min(input.length, newPos + 10)))
           )
             .replaceAll('\n', '\\n')
             .replaceAll('\t', '\\t')
