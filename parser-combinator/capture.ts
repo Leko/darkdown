@@ -1,4 +1,4 @@
-import { Parser, ParseResult, ParseFailed } from './types.ts'
+import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
 
 export const capture = <T, P, S>(
   parserGenerator: (arg: {
@@ -8,15 +8,15 @@ export const capture = <T, P, S>(
 ) => {
   let parseResult: any | null = null
   return parserGenerator({
-    capture: (parser) => (input: string, pos: number) => {
+    capture: (parser) => (input: string, pos: number, ctx: Readonly<Context>) => {
       parseResult = null
-      const result = parser(input, pos)
+      const result = parser(input, pos, ctx)
       if (result[0]) {
         parseResult = result[1]
       }
       return result
     },
-    ifMatch: (callback) => (input: string, pos: number) =>
-      callback(parseResult)(input, pos),
+    ifMatch: (callback) => (input: string, pos: number, ctx: Readonly<Context>) =>
+      callback(parseResult)(input, pos, ctx),
   })
 }

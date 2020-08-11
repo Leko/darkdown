@@ -78,6 +78,10 @@ tests.forEach((spec: Spec) => {
   Deno.test(`[${spec.example}] ${testName}`, async () => {
     const ast = await parse(spec.markdown, {})
     const { html } = await stringify(ast, {})
+    if (html !== spec.html) {
+      await parse(spec.markdown, { context: { debug: false } })
+      console.log(JSON.stringify(ast, null, 2))
+    }
     assertEquals(html, spec.html)
   })
 })

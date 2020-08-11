@@ -1,5 +1,5 @@
 import { HtmlRenderer, Option as StringifyOption } from './renderer/html.ts'
-import { Parser } from './parser-combinator/types.ts'
+import { Parser, Context } from './parser-combinator/types.ts'
 import { Document } from './ast.ts'
 import { tap, many, or, seq, map, EOS } from './parser-combinator.ts'
 import { leafBlockParser } from './parsers/leaf-block.ts'
@@ -10,7 +10,9 @@ import { codeBlockParser } from './parsers/code-block.ts'
 import { emptyLineParser } from './parsers/empty-line.ts'
 import { thematicBreakParser } from './parsers/thematic-break.ts'
 
-type ParseOption = {}
+type ParseOption = {
+  context?: Context
+}
 type Result = {
   html: string
 }
@@ -45,7 +47,6 @@ function tabToSpaces(str: string, tabStop: number): string {
       start = 0
     }
     const spaces = tabStop - (start % tabStop)
-    console.log(JSON.stringify({ start, spaces, matchedEntire }, null, 2))
     return matchedEntire.replace(matched, ' '.repeat(spaces))
   }
   let tmp = str
@@ -78,12 +79,16 @@ export async function parse(
   markdown: string,
   options: ParseOption
 ): Promise<Document> {
+  const ctx = {
+    debug: false,
+    ...(options.context || {}),
+  }
   const prettyMD = tabToSpaces(markdown, 4)
-  const result = documentParser(prettyMD, 0)
+  const result = documentParser(prettyMD, 0, ctx)
   if (!result[0]) {
     throw new Error(`Parse failed:\n${markdown}`)
   }
-  const [,doc,pos] = result
+  const [, doc, pos] = result
   if (pos !== prettyMD.length) {
     throw new Error(`Unexpected token: "${markdown.slice(pos, pos + 1)}"`)
   }
@@ -95,7 +100,6 @@ export async function stringify(
   options: StringifyOption
 ): Promise<Result> {
   const generator = new HtmlRenderer()
-  console.log(JSON.stringify(doc, null, 2))
   let html = generator.render(doc, options)
   return {
     html,

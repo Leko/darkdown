@@ -5,13 +5,16 @@ import {
   bold,
   underline,
 } from 'https://deno.land/std/fmt/colors.ts'
-import { Parser, ParseResult, ParseFailed } from './types.ts'
+import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
 
 export const tap = <T>(identifier: string, parser: Parser<T>) => (
   input: string,
-  pos: number
+  pos: number,
+  ctx: Readonly<Context>
 ): ParseResult<T> | ParseFailed => {
-  return parser(input, pos)
+  if (!ctx.debug) {
+    return parser(input, pos, ctx)
+  }
 
   console.log(
     [identifier, `START: pos=${pos}`]
@@ -28,7 +31,7 @@ export const tap = <T>(identifier: string, parser: Parser<T>) => (
       .join(' ')
   )
   console.group()
-  const [parsed, result, newPos] = parser(input, pos)
+  const [parsed, result, newPos] = parser(input, pos, ctx)
   console.groupEnd()
   if (parsed) {
     console.log(

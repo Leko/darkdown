@@ -1,4 +1,9 @@
-export { ParseFailed, ParseResult, Parser } from './parser-combinator/types.ts'
+export {
+  ParseFailed,
+  ParseResult,
+  Parser,
+  Context,
+} from './parser-combinator/types.ts'
 export { atLeast } from './parser-combinator/atLeast.ts'
 export { between } from './parser-combinator/between.ts'
 export { capture } from './parser-combinator/capture.ts'

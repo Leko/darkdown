@@ -1,10 +1,11 @@
-import { Parser, ParseResult, ParseFailed } from './types.ts'
+import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
 
 export const matchOnly = (parser: Parser<any>) => (
   input: string,
-  pos: number
+  pos: number,
+  ctx: Readonly<Context>
 ): ParseResult<null> | ParseFailed => {
-  const result = parser(input, pos)
+  const result = parser(input, pos, ctx)
   if (result[0]) {
     return [true, null, pos]
   }

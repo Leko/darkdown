@@ -1,8 +1,12 @@
-import { Parser, ParseResult, ParseFailed } from './types.ts'
+import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
 
 export const lazy = <T>(parserGenerator: () => Parser<T>) => {
-  return (input: string, pos: number): ParseResult<T> | ParseFailed => {
+  return (
+    input: string,
+    pos: number,
+    ctx: Readonly<Context>
+  ): ParseResult<T> | ParseFailed => {
     const parser = parserGenerator()
-    return parser(input, pos)
+    return parser(input, pos, ctx)
   }
 }

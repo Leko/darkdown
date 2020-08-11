@@ -1,5 +1,10 @@
 import { C_BACK_SLASH } from '../scanner.ts'
-import { Parser, ParseResult, ParseFailed } from '../parser-combinator.ts'
+import {
+  Parser,
+  ParseResult,
+  ParseFailed,
+  Context,
+} from '../parser-combinator.ts'
 
 export const notEscaped = <T>(
   parser: Parser<T>,
@@ -7,8 +12,12 @@ export const notEscaped = <T>(
 ) => {
   const escapeSeq = option?.escapeSeq ?? C_BACK_SLASH
 
-  return (input: string, pos: number): ParseResult<T> | ParseFailed => {
-    const result = parser(input, pos)
+  return (
+    input: string,
+    pos: number,
+    ctx: Readonly<Context>
+  ): ParseResult<T> | ParseFailed => {
+    const result = parser(input, pos, ctx)
     if (result[0]) {
       if (typeof result[1] !== 'string') {
         throw new Error(
