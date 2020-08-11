@@ -55,13 +55,15 @@ const SKIP_CASES = [
   ...range(118, 161, 1),
   // TODO: Inline HTML
   170,
+  // Head line break
+  196,
 ]
 const omit = (suite: Spec[], indexes: number[]) => {
   return suite.filter((spec) => !indexes.includes(spec.example))
 }
 
 // const tests = omit(suite.slice(186, 187), SKIP_CASES)
-const tests = omit(suite.slice(0, 195), SKIP_CASES)
+const tests = omit(suite.slice(0, 197), SKIP_CASES)
 
 SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)
