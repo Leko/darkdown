@@ -63,7 +63,7 @@ const omit = (suite: Spec[], indexes: number[]) => {
 }
 
 // const tests = omit(suite.slice(186, 187), SKIP_CASES)
-const tests = omit(suite.slice(0, 197), SKIP_CASES)
+const tests = omit(suite.slice(0, 204), SKIP_CASES)
 
 SKIP_CASES.map((index) => suite[index - 1]).forEach((spec: Spec) => {
   const testName = JSON.stringify(spec.markdown)
@@ -79,7 +79,7 @@ tests.forEach((spec: Spec) => {
     const ast = await parse(spec.markdown, {})
     const { html } = await stringify(ast, {})
     if (html !== spec.html) {
-      await parse(spec.markdown, { context: { debug: false } })
+      await parse(spec.markdown, { context: { debug: true } })
       console.log(JSON.stringify(ast, null, 2))
     }
     assertEquals(html, spec.html)

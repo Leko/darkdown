@@ -7,6 +7,7 @@ import {
   C_OPEN_BRACKET,
   C_CLOSE_BRACKET,
   C_NEWLINE,
+  C_GREATER_THAN,
 } from '../scanner.ts'
 import {
   or,
@@ -16,10 +17,11 @@ import {
   tap,
   keyword,
   option,
-  not,
+  char,
   EOS,
   repeatIntercept,
   Parser,
+  between,
 } from '../parser-combinator.ts'
 import { strParser } from '../parsers/str.ts'
 import { Paragraph, Str } from '../ast.ts'
@@ -72,14 +74,25 @@ export const paragraphParser: Parser<Paragraph> = map(
     })(
       seq(
         or(
-          map(tap('paragraph>str', strParser()), (r) => ({
-            ...r,
-            children: [
-              // Trim leading whitespaces
-              { ...r.children[0], text: r.children[0].text.trimStart() },
-              ...r.children.slice(1),
-            ],
-          }))
+          map(
+            tap(
+              'paragraph>str',
+              seq(
+                // FIXME: Move them to block quote parser
+                option(between(char(C_SPACE), 1, 3)),
+                option(char(C_GREATER_THAN)),
+                strParser()
+              )
+            ),
+            ([, , r]) => ({
+              ...r,
+              children: [
+                // Trim leading whitespaces
+                { ...r.children[0], text: r.children[0].text.trimStart() },
+                ...r.children.slice(1),
+              ],
+            })
+          )
           // linkParser,
           // imageParser
         ),

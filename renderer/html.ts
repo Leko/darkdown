@@ -17,7 +17,6 @@ import {
   LinkReference,
   LinkDefinition,
   Text,
-  ASTNode,
 } from '../ast.ts'
 import { C_NEWLINE } from '../scanner.ts'
 
@@ -69,7 +68,7 @@ export class HtmlRenderer {
       .map((c) => this.renderNode(c, doc))
       .filter(Boolean)
     return `<blockquote>${
-      content.length > 0 ? `\n${content.join('')}` : ''
+      content.length > 0 ? `\n${content.join('\n')}` : ''
     }\n</blockquote>`
   }
 

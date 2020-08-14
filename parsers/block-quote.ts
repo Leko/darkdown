@@ -5,9 +5,10 @@ import {
   map,
   atLeast,
   tap,
-  lazy,
   char,
   or,
+  option,
+  between,
 } from '../parser-combinator.ts'
 import { C_SPACE } from '../scanner.ts'
 // FIXME: Circular dependency
@@ -21,13 +22,20 @@ export const blockQuoteParser = map(
   tap(
     'block_quote',
     atLeast(
-      seq(keyword('>'), char(C_SPACE), or(listParser, leafBlockParser)),
+      seq(
+        // Case 200 The > characters can be indented 1-3 spaces:
+        option(between(char(C_SPACE), 1, 3)),
+        keyword('>'),
+        // Case 199 The spaces after the > characters can be omitted:
+        option(char(C_SPACE)),
+        or(listParser, leafBlockParser)
+      ),
       1
     )
   ),
   (r, end, start): BlockQuote => ({
     type: 'block_quote',
-    children: r.map(([_mark, _space, content]) => content),
+    children: r.map(([_spaces, _mark, _space, content]) => content),
     ...toLoC({ end, start }),
   })
 )

@@ -1,4 +1,4 @@
-import { or, seq, map } from '../parser-combinator.ts'
+import { or } from '../parser-combinator.ts'
 import { thematicBreakParser } from './thematic-break.ts'
 import { atxHeadingParser } from './atx-heading.ts'
 import { setextHeadingParser } from './setext-heading.ts'
