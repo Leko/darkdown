@@ -67,32 +67,25 @@ export const paragraphParser: Parser<Paragraph> = map(
         'paragrah>intercepter',
         or(
           tap('paragrah>thematicBreak', thematicBreakParser),
-          tap('paragrah>emptyLine', emptyLineParser)
+          tap('paragrah>emptyLine', emptyLineParser),
+          tap(
+            'paragrah>block_quote',
+            seq(option(between(char(C_SPACE), 1, 3)), char(C_GREATER_THAN))
+          )
         )
       ),
       atLeast: 1,
     })(
       seq(
         or(
-          map(
-            tap(
-              'paragraph>str',
-              seq(
-                // FIXME: Move them to block quote parser
-                option(between(char(C_SPACE), 1, 3)),
-                option(char(C_GREATER_THAN)),
-                strParser()
-              )
-            ),
-            ([, , r]) => ({
-              ...r,
-              children: [
-                // Trim leading whitespaces
-                { ...r.children[0], text: r.children[0].text.trimStart() },
-                ...r.children.slice(1),
-              ],
-            })
-          )
+          map(tap('paragraph>str', strParser()), (r) => ({
+            ...r,
+            children: [
+              // Trim leading whitespaces
+              { ...r.children[0], text: r.children[0].text.trimStart() },
+              ...r.children.slice(1),
+            ],
+          }))
           // linkParser,
           // imageParser
         ),

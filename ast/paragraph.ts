@@ -5,3 +5,7 @@ export type Paragraph = ASTNode<{
   type: 'paragraph'
   children: Str[]
 }>
+
+export function isParagraph(node: any): node is Paragraph {
+  return node?.type === 'paragraph'
+}
