@@ -44,7 +44,6 @@ export const listItemParser = lazy(() =>
     tap(
       'list_item',
       seq(
-        tap('list_item>SOL', SOL()),
         tap('list_item>spaces', many(char(C_SPACE))),
         tap('list_item>marker', listMarker),
         tap('list_item>space', char(C_SPACE)),
@@ -86,9 +85,9 @@ export const listItemParser = lazy(() =>
     ),
     (r, end, start): ListItem => ({
       type: 'list_item',
-      indent: r[1].length,
-      marker: r[2],
-      children: r[4],
+      indent: r[0].length,
+      marker: r[1],
+      children: r[3],
       ...toLoC({ end, start }),
     })
   )
