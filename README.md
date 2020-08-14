@@ -1,4 +1,6 @@
-# darkdown
+# [WIP] darkdown
+
+**Note: This package is under development.**
 
 Markdown parser for Deno
 
