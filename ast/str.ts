@@ -22,3 +22,7 @@ export type Str = ASTNode<{
     | LinkReference
   )[]
 }>
+
+export function isStr(node: any): node is Str {
+  return node?.type === 'str'
+}

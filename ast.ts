@@ -11,7 +11,7 @@ export { LinkReference } from './ast/link-reference.ts'
 export { CodeBlock } from './ast/code-block.ts'
 export { ThematicBreak } from './ast/thematic-break.ts'
 
-export { Str } from './ast/str.ts'
+export { Str, isStr } from './ast/str.ts'
 export { EmptyLine } from './ast/empty-line.ts'
 export { Link } from './ast/link.ts'
 export { LinkDefinition } from './ast/link-definition.ts'
