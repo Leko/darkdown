@@ -1,6 +1,12 @@
-import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
+import {
+  Context,
+  ParseFailed,
+  Parser,
+  ParseResult,
+  VariadicArgumentsParser,
+} from './types.ts'
 
-export const or = (...parsers: Parser<any>[]) => (
+export const or: VariadicArgumentsParser = (...parsers: Parser<any>[]) => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
