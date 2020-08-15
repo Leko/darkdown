@@ -1,6 +1,7 @@
 import { Parser } from './parser.ts'
 
-export const char = <T extends string>(chars: T): Parser<T> => (
+// FIXME: string to union type per character
+export const char = (chars: string): Parser<string> => (
   input: string,
   pos: number
 ) => {
@@ -8,5 +9,5 @@ export const char = <T extends string>(chars: T): Parser<T> => (
   if (c.length === 0 || chars.indexOf(c) === -1) {
     return [false, null, pos]
   }
-  return [true, c as T, pos + 1]
+  return [true, c, pos + 1]
 }

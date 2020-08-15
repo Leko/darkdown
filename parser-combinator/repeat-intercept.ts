@@ -1,12 +1,12 @@
-import { Context, isParseFailed, Parser } from './parser.ts'
+import { AtLeast, Context, isParseFailed, Parser } from './parser.ts'
 
-export const repeatIntercept = <T>({
+export const repeatIntercept = <T, N extends number>({
   intercepter,
-  atLeast = 1,
+  atLeast,
 }: {
   intercepter: Parser<any>
-  atLeast?: number
-}) => (parser: Parser<T>): Parser<T[]> => (
+  atLeast: N
+}) => (parser: Parser<T>): Parser<AtLeast<N, T>> => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
@@ -27,7 +27,12 @@ export const repeatIntercept = <T>({
   }
 
   if (results.length >= atLeast) {
-    return [true, results, newPos]
+    return [
+      true,
+      // @ts-expect-error Property '0' is missing in type 'T[]' but required in type '[T, ...T[]]'
+      results as AtLeast<N, T>,
+      newPos,
+    ]
   }
   return [false, null, pos]
 }
