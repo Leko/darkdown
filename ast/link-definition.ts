@@ -5,6 +5,6 @@ export interface LinkDefinition extends ASTNode {
   identifier: string
   label: string
   url: string
-  title: string
+  title: string | null
   children: never[]
 }

@@ -93,11 +93,12 @@ export const paragraphParser: Parser<Paragraph> = map(
         ),
         map(
           tap('paragraph>option', option(or(lineEnding, EOS()))),
-          // FIXME: Is it "Str"? It's keyword I think.
+          // FIXME: Is it "Str"? It should be keyword I think.
           (r, end, start): Str => ({
             type: 'str',
             children:
               // r[1] === true means end of string
+              // @ts-expect-error Property '0' does not exist on type 'true | Str'
               r && r[0]
                 ? []
                 : [

@@ -124,6 +124,7 @@ export const linkDefinitionParser: Parser<LinkDefinition> = map(
     return {
       type: 'link_definition',
       identifier: label.toLocaleLowerCase(),
+      // @ts-expect-error Type 'string | null' is not assignable to type 'string'
       url: r[3],
       title: r[4],
       label,

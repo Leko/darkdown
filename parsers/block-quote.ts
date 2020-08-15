@@ -47,6 +47,7 @@ export const blockQuoteParser = map(
   (r, end, start): BlockQuote => ({
     type: 'block_quote',
     children: mergeParagraphs(
+      // @ts-expect-error
       r.map(([_spaces, _mark, _space, content]) => content)
     ),
     ...toLoC({ end, start }),
@@ -64,6 +65,7 @@ function mergeParagraphs(
       p.children.push(...node.children)
       p.length = node.start + node.length - p.start
     } else {
+      // @ts-expect-error Argument of type 'ASTNode | Paragraph' is not assignable to parameter of type 'Paragraph'
       children.push(node)
     }
   }

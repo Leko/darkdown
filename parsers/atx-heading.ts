@@ -1,19 +1,19 @@
-import { C_SHARP } from '../scanner.ts'
-import { Heading } from '../ast.ts'
+import { Heading, isStr, Str } from '../ast.ts'
 import {
-  keyword,
-  or,
-  seq,
-  option,
   atLeast,
   between,
-  map,
-  tap,
   char,
+  keyword,
+  map,
   matchOnly,
+  option,
+  or,
+  seq,
+  tap,
 } from '../parser-combinator.ts'
-import { toLoC } from './loc.ts'
+import { C_SHARP } from '../scanner.ts'
 import { lineEnding } from './line-ending.ts'
+import { toLoC } from './loc.ts'
 import { space } from './space.ts'
 import { strParser } from './str.ts'
 
@@ -51,12 +51,10 @@ export const atxHeadingParser = map(
     )
   ),
   (r, end, start): Heading => {
-    const children = (r[2] || [r[3]] || []).filter(
-      (el: any) => el && el.type === 'str'
-    )
+    const children = (r[2] || [r[3]] || []).filter(isStr) as Str[]
     return {
       type: 'heading',
-      level: r[1].length,
+      level: r[1].length as Heading['level'],
       children,
       ...toLoC({ end, start }),
     }

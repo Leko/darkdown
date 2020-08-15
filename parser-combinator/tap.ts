@@ -1,17 +1,17 @@
 import {
-  dim,
-  red,
-  green,
   bold,
+  dim,
+  green,
+  red,
   underline,
 } from 'https://deno.land/std/fmt/colors.ts'
-import { Parser, Parser, , Context } from './types.ts'
+import { Context, Parser } from './types.ts'
 
-export const tap = <T>(identifier: string, parser: Parser<T>) => (
+export const tap = <T>(identifier: string, parser: Parser<T>): Parser<T> => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): Parser<T> => {
+) => {
   if (!ctx.debug) {
     return parser(input, pos, ctx)
   }

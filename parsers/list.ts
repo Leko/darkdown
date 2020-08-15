@@ -45,10 +45,10 @@ export const listItemParser: Parser<ListItem> = lazy(() =>
         tap(
           'list_item>nest',
           or(
-            map(seq(indent(2), listParser), (r) => [r[0]]),
+            map(seq(indent(2), listParser), (r) => [r[1]]),
             map(indentedCodeBlockParser, (r) => [r]),
             tap(
-              'list_item>nest>map',
+              'list_item>nest>paragraph',
               map(
                 seq(
                   paragraphParser,
@@ -70,10 +70,9 @@ export const listItemParser: Parser<ListItem> = lazy(() =>
               )
             ),
             tap(
-              'list_item>nest>map',
+              'list_item>nest>str',
               map(seq(strParser(), lineEnding), (r) => [r[0]])
-            ),
-            tap('list_item>nest>map', char(C_SPACE))
+            )
           )
         )
       )

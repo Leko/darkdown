@@ -1,22 +1,20 @@
-import { C_HYPHEN, C_EQUAL, C_SPACE, C_NEWLINE } from '../scanner.ts'
 import { Heading, Str } from '../ast.ts'
 import {
-  keyword,
-  or,
-  seq,
-  option,
-  lazy,
   atLeast,
-  map,
   between,
-  Parser,
-  tap,
+  keyword,
+  map,
   matchOnly,
+  option,
+  or,
+  Parser,
+  seq,
+  tap,
 } from '../parser-combinator.ts'
+import { C_EQUAL, C_HYPHEN, C_NEWLINE } from '../scanner.ts'
+import { lineEnding } from './line-ending.ts'
 import { toLoC } from './loc.ts'
 import { SOL } from './sol.ts'
-import { lineEnding } from './line-ending.ts'
-import { blankLine } from './blank-line.ts'
 import { space } from './space.ts'
 import { strParser } from './str.ts'
 
@@ -63,7 +61,7 @@ export const setextHeadingParser: Parser<Heading> = map(
   (r, end, start): Heading => ({
     type: 'heading',
     children: r[0].flatMap((rr: any) => rr.slice(2)).slice(0, -1),
-    level: r[3][0] === '=' ? 1 : 2,
+    level: r[3]?.[0] === '=' ? 1 : 2,
     ...toLoC({ end, start }),
   })
 )

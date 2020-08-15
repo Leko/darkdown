@@ -1,29 +1,29 @@
 import { HTML } from '../ast.ts'
 import {
-  C_LESS_THAN,
+  atLeast,
+  capture,
+  char,
+  keyword,
+  lazy,
+  map,
+  option,
+  or,
+  Parser,
+  seq,
+  tap,
+  until,
+} from '../parser-combinator.ts'
+import {
   C_GREATER_THAN,
+  C_LESS_THAN,
+  C_NEWLINE,
   C_SLASH,
   C_SPACE,
-  C_NEWLINE,
 } from '../scanner.ts'
-import {
-  map,
-  keyword,
-  until,
-  or,
-  seq,
-  lazy,
-  atLeast,
-  option,
-  capture,
-  tap,
-  Parser,
-  char,
-} from '../parser-combinator.ts'
+import { lineEnding } from './line-ending.ts'
 import { toLoC } from './loc.ts'
 import { space } from './space.ts'
 import { textParser } from './text.ts'
-import { lineEnding } from './line-ending.ts'
 
 // https://spec.commonmark.org/0.29/#html-block
 
@@ -116,5 +116,4 @@ export const htmlElementParser = map(
 )
 
 // export const htmlParser = or(htmlElementParser, selfCloseHtmlParser)
-// @ts-expect-error
 export const htmlParser: Parser<HTML> = or(htmlElementParser)

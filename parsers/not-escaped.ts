@@ -1,9 +1,4 @@
-import {
-  Context,
-  ,
-  Parser,
-  Parser,
-} from '../parser-combinator.ts'
+import { Context, Parser } from '../parser-combinator.ts'
 import { C_BACK_SLASH } from '../scanner.ts'
 
 export const notEscaped = <T>(
@@ -12,11 +7,7 @@ export const notEscaped = <T>(
 ): Parser<T> => {
   const escapeSeq = option?.escapeSeq ?? C_BACK_SLASH
 
-  return (
-    input: string,
-    pos: number,
-    ctx: Readonly<Context>
-  ): Parser<T> => {
+  return (input: string, pos: number, ctx: Readonly<Context>) => {
     const result = parser(input, pos, ctx)
     if (result[0]) {
       if (typeof result[1] !== 'string') {

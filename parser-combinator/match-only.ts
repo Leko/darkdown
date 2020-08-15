@@ -1,10 +1,10 @@
-import { Parser, Parser, , Context } from './types.ts'
+import { Context, Parser } from './types.ts'
 
-export const matchOnly = (parser: Parser<any>) => (
+export const matchOnly = (parser: Parser<any>): Parser<null> => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): Parser<null> => {
+) => {
   const result = parser(input, pos, ctx)
   if (result[0]) {
     return [true, null, pos]

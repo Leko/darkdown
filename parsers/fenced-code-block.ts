@@ -1,24 +1,24 @@
-import { C_GRAVE_ACCENT, C_TILDE } from '../scanner.ts'
 import { CodeBlock } from '../ast.ts'
 import {
-  keyword,
-  until,
-  many,
-  or,
-  seq,
-  option,
   atLeast,
   between,
-  map,
-  tap,
   capture,
   EOS,
+  keyword,
+  many,
+  map,
+  option,
+  or,
+  seq,
+  tap,
+  until,
 } from '../parser-combinator.ts'
+import { C_GRAVE_ACCENT, C_TILDE } from '../scanner.ts'
 import { deindent } from '../util/deindent.ts'
-import { SOL } from './sol.ts'
 import { lineEnding } from './line-ending.ts'
-import { space } from './space.ts'
 import { toLoC } from './loc.ts'
+import { SOL } from './sol.ts'
+import { space } from './space.ts'
 
 // https://spec.commonmark.org/0.29/#fenced-code-blocks
 const fencedCodeBlockParserGenerator = (
@@ -89,7 +89,9 @@ export const fencedCodeBlockParser = map(
   (r, end, start): CodeBlock => {
     const [, indentation, , meta, , ...rest] = r
     const deindentLevel = indentation ? indentation.length : 0
+    // @ts-expect-error Element implicitly has an 'any' type because expression of type '1' can't be used to index type 'Str'.
     const language = meta ? meta[1] || null : null
+    // @ts-expect-error Element implicitly has an 'any' type because expression of type '1' can't be used to index type 'Str'.
     const info = meta ? meta[3] || null : null
     if (!Array.isArray(rest)) {
       return {

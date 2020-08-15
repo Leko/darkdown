@@ -14,5 +14,5 @@ export interface ASTText extends LoC {
 }
 
 export interface ASTNode extends LoC {
-  children: never[]
+  children: any[]
 }
