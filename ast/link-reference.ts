@@ -1,6 +1,6 @@
 import { ASTText } from './types.ts'
 
-export type LinkReference = ASTText<{
+export interface LinkReference extends ASTText {
   type: 'link_reference'
   identifier: string
-}>
+}

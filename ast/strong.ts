@@ -1,5 +1,5 @@
 import { ASTText } from './types.ts'
 
-export type Strong = ASTText<{
+export interface Strong extends ASTText {
   type: 'strong'
-}>
+}

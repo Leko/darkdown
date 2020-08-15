@@ -1,5 +1,5 @@
 import { ASTText } from './types.ts'
 
-export type LineBreak = ASTText<{
+export interface LineBreak extends ASTText {
   type: 'linebreak'
-}>
+}

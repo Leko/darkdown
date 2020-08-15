@@ -30,7 +30,7 @@ export type FIXME_All_Nodes =
   | Heading
   | HTMLBlock
 
-export type Document = ASTNode<{
+export interface Document extends ASTNode {
   type: 'document'
   children: FIXME_All_Nodes[]
-}>
+}

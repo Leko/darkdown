@@ -9,7 +9,7 @@ import { HTML } from './html.ts'
 import { LinkReference } from './link-reference.ts'
 
 // It's not defined in spec
-export type Str = ASTNode<{
+export interface Str extends ASTNode {
   type: 'str'
   children: (
     | Text
@@ -21,7 +21,7 @@ export type Str = ASTNode<{
     | HTML
     | LinkReference
   )[]
-}>
+}
 
 export function isStr(node: any): node is Str {
   return node?.type === 'str'

@@ -1,5 +1,5 @@
 import { ASTText } from './types.ts'
 
-export type SoftBreak = ASTText<{
+export interface SoftBreak extends ASTText {
   type: 'softbreak'
-}>
+}

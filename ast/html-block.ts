@@ -1,7 +1,7 @@
 import { ASTNode } from './types.ts'
 import { Paragraph } from './paragraph.ts'
 
-export type HTMLBlock = ASTNode<{
+export interface HTMLBlock extends ASTNode {
   type: 'html_block'
   children: Paragraph[]
-}>
+}

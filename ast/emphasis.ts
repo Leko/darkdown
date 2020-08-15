@@ -1,5 +1,5 @@
 import { ASTText } from './types.ts'
 
-export type Emphasis = ASTText<{
+export interface Emphasis extends ASTText {
   type: 'emph'
-}>
+}

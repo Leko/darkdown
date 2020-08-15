@@ -1,8 +1,8 @@
 import { ASTNode } from './types.ts'
 import { Str } from './str.ts'
 
-export type Image = ASTNode<{
+export interface Image extends ASTNode {
   type: 'image'
   children: Str[]
   title: string
-}>
+}

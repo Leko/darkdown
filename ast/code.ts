@@ -1,5 +1,5 @@
 import { ASTText } from './types.ts'
 
-export type Code = ASTText<{
+export interface Code extends ASTText {
   type: 'code'
-}>
+}

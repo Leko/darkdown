@@ -5,8 +5,8 @@ import { ListItem } from './list-item.ts'
 
 export type ListType = BulletListMarker['type'] | OrderedListMarker['type']
 
-export type List = ASTNode<{
+export interface List extends ASTNode {
   type: 'list'
   listType: ListType
   children: ListItem[]
-}>
+}
