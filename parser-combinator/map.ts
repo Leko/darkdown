@@ -1,4 +1,4 @@
-import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
+import { Parser, Parser, , Context } from './types.ts'
 
 export const map = <T, P>(
   parser: Parser<T>,
@@ -13,7 +13,7 @@ export const map = <T, P>(
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): ParseResult<P> | ParseFailed => {
+): Parser<P> => {
   const result = parser(input, pos, ctx)
   if (result[0]) {
     return [true, mapper(result[1], result[2], pos, input, ctx), result[2]]

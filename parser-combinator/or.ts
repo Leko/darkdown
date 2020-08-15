@@ -1,8 +1,8 @@
 import {
   Context,
-  ParseFailed,
+  ,
   Parser,
-  ParseResult,
+  Parser,
   VariadicArgumentsParser,
 } from './types.ts'
 
@@ -10,7 +10,7 @@ export const or: VariadicArgumentsParser = (...parsers: Parser<any>[]) => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): ParseResult<any[]> | ParseFailed => {
+): Parser<any[]> => {
   for (let parser of parsers) {
     const result = parser(input, pos, ctx)
     if (result[0]) {

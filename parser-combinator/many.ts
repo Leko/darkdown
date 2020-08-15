@@ -1,10 +1,10 @@
-import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
+import { Parser, Parser, , Context } from './types.ts'
 
 export const many = <T>(parser: Parser<T>) => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): ParseResult<T[]> | ParseFailed => {
+): Parser<T[]> => {
   const results: T[] = []
   let newPos = pos
   while (newPos <= input.length) {

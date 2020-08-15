@@ -1,8 +1,8 @@
 import {
   Context,
-  ParseFailed,
+  ,
   Parser,
-  ParseResult,
+  Parser,
 } from '../parser-combinator.ts'
 import { C_BACK_SLASH } from '../scanner.ts'
 
@@ -16,7 +16,7 @@ export const notEscaped = <T>(
     input: string,
     pos: number,
     ctx: Readonly<Context>
-  ): ParseResult<T> | ParseFailed => {
+  ): Parser<T> => {
     const result = parser(input, pos, ctx)
     if (result[0]) {
       if (typeof result[1] !== 'string') {

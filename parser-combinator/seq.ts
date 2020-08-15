@@ -1,10 +1,10 @@
-import { Parser, ParseResult, ParseFailed, Context } from './types.ts'
+import { Parser, Parser, , Context } from './types.ts'
 
 export const seq = (...parsers: Parser<any>[]) => (
   input: string,
   pos: number,
   ctx: Readonly<Context>
-): ParseResult<any[]> | ParseFailed => {
+): Parser<any[]> => {
   const results = []
   let newPos = pos
   for (let parser of parsers) {
