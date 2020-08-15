@@ -1,25 +1,36 @@
-import { BlockQuote, Str, isParagraph, Paragraph, ASTNode } from '../ast.ts'
+import { ASTNode, BlockQuote, isParagraph, Paragraph } from '../ast.ts'
 import {
-  keyword,
-  seq,
-  map,
-  atLeast,
-  tap,
-  char,
-  or,
-  option,
   between,
+  char,
+  keyword,
+  map,
+  option,
+  or,
+  repeatIntercept,
+  seq,
+  tap,
 } from '../parser-combinator.ts'
 import { C_SPACE } from '../scanner.ts'
+import { emptyLineParser } from './empty-line.ts'
 import { leafBlockParser } from './leaf-block.ts'
 import { listParser } from './list.ts'
-import { toLoC, pickLoC } from './loc.ts'
+import { toLoC } from './loc.ts'
+import { thematicBreakParser } from './thematic-break.ts'
 
 // https://spec.commonmark.org/0.29/#block-quotes
 export const blockQuoteParser = map(
   tap(
     'block_quote',
-    atLeast(
+    repeatIntercept({
+      intercepter: tap(
+        'block_quote>intercepter',
+        or(
+          tap('block_quote>thematicBreak', thematicBreakParser),
+          tap('block_quote>emptyLine', emptyLineParser)
+        )
+      ),
+      atLeast: 1,
+    })(
       tap(
         'block_quote>seq',
         seq(
@@ -30,8 +41,7 @@ export const blockQuoteParser = map(
           option(char(C_SPACE)),
           or(listParser, leafBlockParser)
         )
-      ),
-      1
+      )
     )
   ),
   (r, end, start): BlockQuote => ({
@@ -45,7 +55,7 @@ export const blockQuoteParser = map(
 
 // TODO: Refactor
 function mergeParagraphs(
-  nodes: (Paragraph | ASTNode<{ type: string; children: never[] }>)[]
+  nodes: (Paragraph | ASTNode)[]
 ): BlockQuote['children'] {
   const children: BlockQuote['children'] = []
   for (let node of nodes) {
@@ -54,7 +64,6 @@ function mergeParagraphs(
       p.children.push(...node.children)
       p.length = node.start + node.length - p.start
     } else {
-      // @ts-expect-error
       children.push(node)
     }
   }
