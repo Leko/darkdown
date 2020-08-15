@@ -1,25 +1,24 @@
-import {
-  C_SPACE,
-  C_OPEN_BRACKET,
-  C_CLOSE_BRACKET,
-  C_BACK_SLASH,
-} from '../scanner.ts'
-import {
-  map,
-  char,
-  seq,
-  option,
-  tap,
-  between,
-  matchOnly,
-} from '../parser-combinator.ts'
-import { sandwiched } from './sandwiched.ts'
-import { lineEnding } from './line-ending.ts'
 import { LinkReference } from '../ast.ts'
+import {
+  between,
+  char,
+  map,
+  option,
+  Parser,
+  seq,
+  tap,
+} from '../parser-combinator.ts'
+import {
+  C_BACK_SLASH,
+  C_CLOSE_BRACKET,
+  C_OPEN_BRACKET,
+  C_SPACE,
+} from '../scanner.ts'
 import { toLoC } from './loc.ts'
+import { sandwiched } from './sandwiched.ts'
 
 // https://spec.commonmark.org/0.29/#link-reference-definitions
-export const linkReferenceParser = map(
+export const linkReferenceParser: Parser<LinkReference> = map(
   tap(
     `link_reference`,
     seq(

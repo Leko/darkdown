@@ -1,23 +1,24 @@
 import { ThematicBreak } from '../ast.ts'
-import { C_TAB, C_ASTERISK, C_HYPHEN, C_UNDERLINE } from '../scanner.ts'
 import {
+  between,
   keyword,
   many,
-  or,
-  seq,
-  option,
-  between,
   map,
+  option,
+  or,
+  Parser,
+  seq,
 } from '../parser-combinator.ts'
+import { C_ASTERISK, C_HYPHEN, C_TAB, C_UNDERLINE } from '../scanner.ts'
+import { lineEnding } from './line-ending.ts'
 import { toLoC } from './loc.ts'
 import { SOL } from './sol.ts'
-import { lineEnding } from './line-ending.ts'
 import { space } from './space.ts'
 
 const thematicBreakPadding = many(or(space, keyword(C_TAB)))
 
 // https://spec.commonmark.org/0.29/#thematic-breaks
-export const thematicBreakParser = map(
+export const thematicBreakParser: Parser<ThematicBreak> = map(
   seq(
     SOL(),
     option(seq(between(space, 1, 3))),

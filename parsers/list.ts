@@ -1,45 +1,40 @@
-import { List } from '../ast.ts'
-import { map, atLeast, tap } from '../parser-combinator.ts'
-// FIXME: Circular dependency
-// import { listItemParser } from '../parsers/list-item.ts'
-import { ListItem } from '../ast.ts'
-import { C_SPACE, C_NEWLINE } from '../scanner.ts'
-import { char, many, seq, lazy, or, option } from '../parser-combinator.ts'
-import { SOL } from './sol.ts'
+import { List, ListItem } from '../ast.ts'
+import {
+  atLeast,
+  char,
+  lazy,
+  many,
+  map,
+  or,
+  Parser,
+  seq,
+  tap,
+} from '../parser-combinator.ts'
+import { C_SPACE } from '../scanner.ts'
+import { emptyLineParser } from './empty-line.ts'
+import { indent } from './indent.ts'
+import { indentedCodeBlockParser } from './indented-code-block.ts'
 import { lineEnding } from './line-ending.ts'
 import { listMarker } from './list-marker.ts'
-// FIXME: Circular dependency
-// import { containerBlockParser } from './container-block.ts'
-import { blockQuoteParser } from './block-quote.ts'
-import { leafBlockParser } from './leaf-block.ts'
-import { indentedCodeBlockParser } from './indented-code-block.ts'
-import { strParser } from './str.ts'
-import { paragraphParser } from './paragraph.ts'
-import { indent } from './indent.ts'
 import { toLoC } from './loc.ts'
-import { emptyLineParser } from './empty-line.ts'
+import { paragraphParser } from './paragraph.ts'
+import { strParser } from './str.ts'
 
 // https://spec.commonmark.org/0.29/#list
-// @ts-expect-error
-export const listParser = lazy(() =>
+export const listParser: Parser<List> = lazy(() =>
   map(
     tap('list', atLeast(listItemParser, 1)),
     (r, end, start): List => ({
       type: 'list',
-      // @ts-expect-error
       listType: r[0].marker.type,
-      // @ts-expect-error
       children: r,
       ...toLoC({ end, start }),
     })
   )
 )
 
-type TODO<Comment extends string> = any
-
 // https://spec.commonmark.org/0.29/#list-items
-// @ts-expect-error
-export const listItemParser = lazy(() =>
+export const listItemParser: Parser<ListItem> = lazy(() =>
   map(
     tap(
       'list_item',

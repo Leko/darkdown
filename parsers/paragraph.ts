@@ -1,36 +1,37 @@
+import { Image, Link, Paragraph, Str } from '../ast.ts'
 import {
-  C_SPACE,
-  C_DOUBLE_QUOTE,
-  C_SINGLE_QUOTE,
-  C_OPEN_PARENTHES,
-  C_CLOSE_PARENTHES,
-  C_OPEN_BRACKET,
-  C_CLOSE_BRACKET,
-  C_NEWLINE,
-  C_GREATER_THAN,
-} from '../scanner.ts'
-import {
-  or,
   atLeast,
-  map,
-  seq,
-  tap,
-  keyword,
-  option,
+  between,
   char,
   EOS,
-  repeatIntercept,
+  keyword,
+  map,
+  option,
+  or,
   Parser,
-  between,
+  repeatIntercept,
+  seq,
+  tap,
 } from '../parser-combinator.ts'
 import { strParser } from '../parsers/str.ts'
-import { Paragraph, Str } from '../ast.ts'
-import { toLoC } from './loc.ts'
-import { lineEnding } from './line-ending.ts'
-import { thematicBreakParser } from './thematic-break.ts'
+import {
+  C_CLOSE_BRACKET,
+  C_CLOSE_PARENTHES,
+  C_DOUBLE_QUOTE,
+  C_GREATER_THAN,
+  C_NEWLINE,
+  C_OPEN_BRACKET,
+  C_OPEN_PARENTHES,
+  C_SINGLE_QUOTE,
+  C_SPACE,
+} from '../scanner.ts'
 import { emptyLineParser } from './empty-line.ts'
+import { lineEnding } from './line-ending.ts'
+import { toLoC } from './loc.ts'
+import { thematicBreakParser } from './thematic-break.ts'
 
-export const linkParser = seq(
+// @ts-expect-error
+export const linkParser: Parser<Link> = seq(
   keyword(C_OPEN_BRACKET),
   strParser(),
   keyword(C_CLOSE_BRACKET),
@@ -57,7 +58,8 @@ export const linkParser = seq(
   )
 )
 
-export const imageParser = seq(keyword('!'), linkParser)
+// @ts-expect-error
+export const imageParser: Parser<Image> = seq(keyword('!'), linkParser)
 
 export const paragraphParser: Parser<Paragraph> = map(
   tap(

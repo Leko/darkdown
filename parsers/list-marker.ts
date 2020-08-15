@@ -1,6 +1,11 @@
-import { or } from '../parser-combinator.ts'
+import { BulletListMarker, OrderedListMarker } from '../ast.ts'
+import { or, Parser } from '../parser-combinator.ts'
 import { bulletListMarker } from './bullet-list-marker.ts'
 import { orderedListMarker } from './ordered-list-marker.ts'
 
 // https://spec.commonmark.org/0.29/#list-marker
-export const listMarker = or(bulletListMarker, orderedListMarker)
+// @ts-expect-error Type '(input: string, pos: number, ctx: Readonly<Context>) => ParseResult<any[]> | ParseFailed' is not assignable to type 'Parser<ASTNode<{ type: "bullet_list_marker"; char: string;
+export const listMarker: Parser<BulletListMarker | OrderedListMarker> = or(
+  bulletListMarker,
+  orderedListMarker
+)

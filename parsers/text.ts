@@ -1,9 +1,9 @@
-import { map, atLeast, tap, EOS, nor, Parser } from '../parser-combinator.ts'
-import { toLoC } from './loc.ts'
-import { lineEnding } from './line-ending.ts'
 import { Text } from '../ast.ts'
+import { atLeast, EOS, map, nor, Parser, tap } from '../parser-combinator.ts'
+import { lineEnding } from './line-ending.ts'
+import { toLoC } from './loc.ts'
 
-export const textParser = (except?: Parser<any>) =>
+export const textParser = (except?: Parser<any>): Parser<Text> =>
   map(
     tap(
       'text',

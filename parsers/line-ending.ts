@@ -1,10 +1,10 @@
-import { C_NEWLINE, C_CARRIAGE_RETURN } from '../scanner.ts'
 import { Str } from '../ast.ts'
-import { map, char, seq, option } from '../parser-combinator.ts'
+import { char, map, option, Parser, seq } from '../parser-combinator.ts'
+import { C_CARRIAGE_RETURN, C_NEWLINE } from '../scanner.ts'
 import { toLoC } from './loc.ts'
 
 // https://spec.commonmark.org/0.29/#line-ending
-export const lineEnding = map(
+export const lineEnding: Parser<Str> = map(
   seq(option(char(C_CARRIAGE_RETURN)), char(C_NEWLINE)),
   (r, end, start): Str => ({
     type: 'str',

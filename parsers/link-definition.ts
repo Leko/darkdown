@@ -1,36 +1,36 @@
-import {
-  C_SPACE,
-  C_DOUBLE_QUOTE,
-  C_SINGLE_QUOTE,
-  C_COLON,
-  C_LESS_THAN,
-  C_GREATER_THAN,
-  C_OPEN_BRACKET,
-  C_CLOSE_BRACKET,
-  C_BACK_SLASH,
-  C_NEWLINE,
-} from '../scanner.ts'
-import {
-  map,
-  keyword,
-  char,
-  not,
-  or,
-  seq,
-  option,
-  tap,
-  between,
-  atLeast,
-} from '../parser-combinator.ts'
-import { SOL } from './sol.ts'
-import { sandwiched } from './sandwiched.ts'
-import { wrapped } from './wrapped.ts'
-import { lineEnding } from './line-ending.ts'
-import { anyWhitespaces } from './whitespaces.ts'
 import { LinkDefinition } from '../ast.ts'
-import { toLoC } from './loc.ts'
+import {
+  atLeast,
+  between,
+  char,
+  keyword,
+  map,
+  not,
+  option,
+  or,
+  Parser,
+  seq,
+  tap,
+} from '../parser-combinator.ts'
+import {
+  C_BACK_SLASH,
+  C_CLOSE_BRACKET,
+  C_COLON,
+  C_DOUBLE_QUOTE,
+  C_GREATER_THAN,
+  C_LESS_THAN,
+  C_NEWLINE,
+  C_OPEN_BRACKET,
+  C_SINGLE_QUOTE,
+  C_SPACE,
+} from '../scanner.ts'
 import { emptyLineParser } from './empty-line.ts'
+import { lineEnding } from './line-ending.ts'
+import { toLoC } from './loc.ts'
+import { sandwiched } from './sandwiched.ts'
 import { space } from './space.ts'
+import { anyWhitespaces } from './whitespaces.ts'
+import { wrapped } from './wrapped.ts'
 
 const spaces = or(
   seq(atLeast(char(C_SPACE), 0), char(C_NEWLINE), atLeast(char(C_SPACE), 0)),
@@ -38,7 +38,7 @@ const spaces = or(
 )
 
 // https://spec.commonmark.org/0.29/#link-reference-definitions
-export const linkDefinitionParser = map(
+export const linkDefinitionParser: Parser<LinkDefinition> = map(
   tap(
     'link_definition',
     seq(
