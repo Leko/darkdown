@@ -1,4 +1,4 @@
-import { Parser } from './types.ts'
+import { Parser } from './parser.ts'
 
 export const char = <T extends string>(chars: T): Parser<T> => (
   input: string,

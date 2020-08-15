@@ -1,4 +1,4 @@
-import { Context, Parser } from './types.ts'
+import { Context, isParseResult, Parser } from './parser.ts'
 
 export const or: VariadicOr = (...parsers: Parser<any>[]): Parser<any[]> => (
   input: string,
@@ -7,7 +7,7 @@ export const or: VariadicOr = (...parsers: Parser<any>[]): Parser<any[]> => (
 ) => {
   for (let parser of parsers) {
     const result = parser(input, pos, ctx)
-    if (result[0]) {
+    if (isParseResult(result)) {
       return result
     }
   }

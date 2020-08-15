@@ -1,14 +1,21 @@
-import { HtmlRenderer, Option as StringifyOption } from './renderer/html.ts'
-import { Parser, Context } from './parser-combinator/types.ts'
 import { Document } from './ast.ts'
-import { tap, many, or, seq, map, EOS } from './parser-combinator.ts'
-import { leafBlockParser } from './parsers/leaf-block.ts'
-import { containerBlockParser } from './parsers/container-block.ts'
+import {
+  Context,
+  EOS,
+  isParseFailed,
+  many,
+  map,
+  or,
+  Parser,
+  seq,
+  tap,
+} from './parser-combinator.ts'
 import { blockQuoteParser } from './parsers/block-quote.ts'
-import { listParser } from './parsers/list.ts'
 import { codeBlockParser } from './parsers/code-block.ts'
-import { emptyLineParser } from './parsers/empty-line.ts'
+import { leafBlockParser } from './parsers/leaf-block.ts'
+import { listParser } from './parsers/list.ts'
 import { thematicBreakParser } from './parsers/thematic-break.ts'
+import { HtmlRenderer, Option as StringifyOption } from './renderer/html.ts'
 
 type ParseOption = {
   context?: Context
@@ -85,7 +92,7 @@ export async function parse(
   }
   const prettyMD = tabToSpaces(markdown, 4)
   const result = documentParser(prettyMD, 0, ctx)
-  if (!result[0]) {
+  if (isParseFailed(result)) {
     throw new Error(`Parse failed:\n${markdown}`)
   }
   const [, doc, pos] = result

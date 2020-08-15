@@ -1,4 +1,4 @@
-import { Context, Parser } from './types.ts'
+import { Context, isParseFailed, Parser } from './parser.ts'
 
 // @ts-expect-error Property '0' is missing in type 'any[]' but required in type '[any]'
 export const seq: VariadicSeq = (...parsers: Parser<any>[]): Parser<any[]> => (
@@ -10,7 +10,7 @@ export const seq: VariadicSeq = (...parsers: Parser<any>[]): Parser<any[]> => (
   let newPos = pos
   for (let parser of parsers) {
     const result = parser(input, newPos, ctx)
-    if (!result[0]) {
+    if (isParseFailed(result)) {
       return [false, null, pos]
     }
     newPos = result[2]

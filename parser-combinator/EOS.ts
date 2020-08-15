@@ -1,4 +1,4 @@
-import { Parser } from './types.ts'
+import { Parser } from './parser.ts'
 
 // End of string
 export const EOS = (): Parser<boolean> => (input: string, pos: number) => {

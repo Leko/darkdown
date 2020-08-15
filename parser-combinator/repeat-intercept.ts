@@ -1,4 +1,4 @@
-import { Parser, Context } from './types.ts'
+import { Context, isParseFailed, Parser } from './parser.ts'
 
 export const repeatIntercept = <T>({
   intercepter,
@@ -19,7 +19,7 @@ export const repeatIntercept = <T>({
       break
     }
     const result = parser(input, newPos, ctx)
-    if (!result[0]) {
+    if (isParseFailed(result)) {
       break
     }
     results.push(result[1])

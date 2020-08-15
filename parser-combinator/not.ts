@@ -1,4 +1,4 @@
-import { Context, Parser } from './types.ts'
+import { Context, isParseResult, Parser } from './parser.ts'
 
 export const not = (parser: Parser<any>): Parser<string> => (
   input: string,
@@ -6,7 +6,7 @@ export const not = (parser: Parser<any>): Parser<string> => (
   ctx: Readonly<Context>
 ) => {
   const result = parser(input, pos, ctx)
-  if (result[0]) {
+  if (isParseResult(result)) {
     return [false, null, pos]
   }
   return [true, input.slice(pos, pos + 1), pos + 1]

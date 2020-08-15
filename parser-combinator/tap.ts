@@ -5,7 +5,7 @@ import {
   red,
   underline,
 } from 'https://deno.land/std/fmt/colors.ts'
-import { Context, Parser } from './types.ts'
+import { Context, Parser } from './parser.ts'
 
 export const tap = <T>(identifier: string, parser: Parser<T>): Parser<T> => (
   input: string,

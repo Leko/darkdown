@@ -1,4 +1,4 @@
-import { Context, Parser } from './types.ts'
+import { Context, Parser } from './parser.ts'
 
 export const lazy = <T>(parserGenerator: () => Parser<T>): Parser<T> => {
   return (input: string, pos: number, ctx: Readonly<Context>) => {

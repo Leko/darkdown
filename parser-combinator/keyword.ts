@@ -1,4 +1,4 @@
-import { Parser } from './types.ts'
+import { Parser } from './parser.ts'
 
 export const keyword = <T extends string>(token: T): Parser<T> => (
   input: string,
